@@ -24,12 +24,6 @@ The CRE serves three critical functions:
 2. **Relationship Detection** — Identify reinforcement, contradictions, gaps, and novel contributions
 3. **Model Evolution** — Update confidence levels, restructure beliefs, and trigger deeper analysis when needed
 
-## Implementation Approach
-
-The CRE implements the **Agentic Screening Pattern** for disagreement-driven decision assurance. Rather than relying solely on model confidence scores, the CRE infers genuine uncertainty from **independent agent disagreement**, enabling robust contradiction detection and belief evolution.
-
-See **[pca-cre-agentic-screening-logic.md](pca-cre-agentic-screening-logic.md)** for complete logic formalization, decision trees, escalation rules, and implementation guidance.
-
 ## Core Responsibilities
 
 The CRE is responsible for:
@@ -92,19 +86,14 @@ Broader synthesis using expanded retrieval and extended review controls.
 
 ### Input
 
-Input contract (confidence_score: 0.0–1.0):
-
 ```json
 {
-  "input_id": "550e8400-e29b-41d4-a716-446655440000",
-  "content": "New finding on topic X contradicts previous understanding",
-  "source": "research-database-001",
-  "confidence_score": 0.75,
-  "domain": "health-policy",
-  "metadata": {
-    "timestamp": "2026-04-24T22:00:00Z",
-    "priority": "high"
-  }
+  "input_id": "uuid",
+  "content": "string",
+  "source": "string",
+  "confidence_score": 0.0-1.0,
+  "domain": "string",
+  "metadata": {}
 }
 ```
 
@@ -145,63 +134,47 @@ Input contract (confidence_score: 0.0–1.0):
 
 ### Output
 
-Output contract (confidence_delta: -0.3 to +0.3, confidence ranges: 0.0–1.0, all enum types shown):
-
 ```json
 {
-  "reconciliation_id": "660f9511-f30c-52e5-b827-557766551111",
-  "input_id": "550e8400-e29b-41d4-a716-446655440000",
-  "mode": "local",
+  "reconciliation_id": "uuid",
+  "input_id": "uuid",
+  "mode": "off | local | deep",
   "relationships": [
     {
-      "related_node_id": "770g9622-g41d-63f6-c838-668877662222",
-      "relationship_type": "challenge",
-      "confidence_delta": -0.15,
-      "evidence_summary": "New finding contradicts prior assumption on mechanism",
-      "requires_update": true
-    },
-    {
-      "related_node_id": "880h0733-h52e-74g7-d949-779988773333",
-      "relationship_type": "expansion",
-      "confidence_delta": 0.08,
-      "evidence_summary": "New finding adds supporting evidence to adjacent domain",
-      "requires_update": false
+      "related_node_id": "uuid",
+      "relationship_type": "reinforcement | challenge | expansion | novel | null",
+      "confidence_delta": -0.3 to 0.3,
+      "evidence_summary": "string",
+      "requires_update": boolean
     }
   ],
   "contradictions": [
     {
-      "conflicting_nodes": ["node-abc-123", "node-def-456"],
-      "severity": "medium",
-      "implication": "Confidence in downstream reasoning may be affected",
-      "requires_human_review": true
+      "conflicting_nodes": ["uuid", "uuid"],
+      "severity": "low | medium | high",
+      "implication": "string",
+      "requires_human_review": boolean
     }
   ],
   "confidence_updates": [
     {
-      "node_id": "node-abc-123",
-      "current_confidence": 0.82,
-      "recommended_confidence": 0.67,
-      "justification": "Contradiction with medium severity reduces confidence"
+      "node_id": "uuid",
+      "current_confidence": 0.0-1.0,
+      "recommended_confidence": 0.0-1.0,
+      "justification": "string"
     }
   ],
   "action_items": [
     {
-      "type": "escalate",
-      "priority": "high",
-      "description": "High-severity contradiction requires human decision on belief update",
-      "owner": "human",
-      "target": "belief-cluster-health-policy"
-    },
-    {
-      "type": "research",
-      "priority": "medium",
-      "description": "Source supporting evidence to resolve contradiction",
-      "owner": "agent",
-      "target": "node-abc-123"
+      "type": "research | clarify | restructure | escalate | monitor",
+      "priority": "low | medium | high",
+      "description": "string",
+      "owner": "human | agent",
+      "target": "node_id or domain"
     }
   ],
-  "integration_recommendation": "review",
-  "narrative_summary": "New input challenges existing understanding on mechanism (medium severity). One related node confidence reduced 0.82→0.67. Recommend human review before integration."
+  "integration_recommendation": "accept | review | escalate | request_clarification",
+  "narrative_summary": "string"
 }
 ```
 
