@@ -12,6 +12,18 @@ tasks:
     model: gwen
     fallback: gpt
 
+  diagram_interpretation:
+    model: gwen_vl
+
+  document_parsing:
+    model: gwen_vl
+
+  image_reasoning:
+    model: llava
+
+  ui_reconstruction:
+    model: glm_v
+
   general_reasoning:
     model: gpt
 
