@@ -1,0 +1,32 @@
+tasks:
+
+  validation:
+    model: gwen
+    fallback: gpt
+
+  classification:
+    model: gwen
+    fallback: gpt
+
+  quick_reasoning:
+    model: gwen
+    fallback: gpt
+
+  general_reasoning:
+    model: gpt
+
+  deep_analysis:
+    model: gpt
+
+  uml_generation:
+    model: claude
+
+  architecture_diagram:
+    model: claude
+
+  structured_output:
+    model: claude
+
+  enterprise_simulation:
+    model: azure
+    fallback: gpt
