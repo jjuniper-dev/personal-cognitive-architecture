@@ -12,7 +12,9 @@ status: active
 
 This document defines how the PCA should operate at runtime and how control is maintained across capture, validation, orchestration, reconciliation, and action.
 
-It exists to prevent drift into uncontrolled autonomy or ad hoc workflow sprawl.
+It establishes the rules for when humans decide and when the system decides. It prevents drift into uncontrolled autonomy or ad hoc workflow sprawl. It ensures every action is traceable, auditable, and reversible.
+
+The operating model is the governance skeleton that keeps the architecture from becoming a black box.
 
 ## Operating model summary
 
@@ -74,7 +76,23 @@ Human review is required when:
 
 Human review is not a failure state. It is a design feature.
 
-## Reconciliation model
+## Cognitive Reconciliation Engine Integration
+
+The Cognitive Reconciliation Engine (CRE) is the core mechanism by which the PCA actively evaluates new information against existing knowledge, identifies relationships and contradictions, and evolves its internal model.
+
+The CRE operates within a governed framework:
+
+### Reconciliation Triggers
+
+Reconciliation is invoked (not default) when:
+
+- New input contradicts high-confidence existing knowledge
+- Cross-domain synthesis is required
+- Strategic decision depends on complete relationship analysis
+- Explicit human request initiates reconciliation
+- A worker agent requests deeper analysis before proceeding
+
+### Reconciliation Model (See pca-cognitive-reconciliation-engine.md for full spec)
 
 Reconciliation is not always on.
 
