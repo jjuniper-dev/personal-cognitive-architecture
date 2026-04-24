@@ -15,6 +15,22 @@ models:
     runtime: ollama
     role: lightweight
 
+  gwen_vl:
+    provider: local
+    backend: qwen2.5-vl
+    runtime: ollama
+    role: multimodal_reasoning
+
+  glm_v:
+    provider: local
+    backend: glm-4.6v
+    role: ui_reconstruction
+
+  llava:
+    provider: local
+    backend: llava
+    role: general_multimodal
+
   azure:
     provider: azure_openai
     role: governed_execution
