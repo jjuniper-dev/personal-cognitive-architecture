@@ -1,0 +1,20 @@
+models:
+  default: gpt
+
+  gpt:
+    provider: openai
+    role: general_reasoning
+
+  claude:
+    provider: anthropic
+    role: structured_output
+
+  gwen:
+    provider: local
+    backend: qwen2.5-7b-instruct
+    runtime: ollama
+    role: lightweight
+
+  azure:
+    provider: azure_openai
+    role: governed_execution
