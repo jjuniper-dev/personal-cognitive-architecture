@@ -1,0 +1,192 @@
+{
+  "cognitive_states": {
+    "deep_focus": {
+      "label": "Deep Focus",
+      "description": "Peak mental clarity, maximum focus, deep work happening",
+      "energy_requirement": "High",
+      "typical_duration_minutes": 90,
+      "risk_level": "Low",
+      "feedback_loop_risk": false
+    },
+    "recharge": {
+      "label": "Recharge",
+      "description": "Solo time, processing, resetting",
+      "energy_requirement": "Low",
+      "typical_duration_minutes": 60,
+      "risk_level": "Low",
+      "feedback_loop_risk": false
+    },
+    "reflection": {
+      "label": "Reflection",
+      "description": "Strategic thinking, planning, analyzing",
+      "energy_requirement": "Medium",
+      "typical_duration_minutes": 30,
+      "risk_level": "HIGH - Feedback Loop Risk",
+      "feedback_loop_risk": true,
+      "max_consecutive_minutes": 45,
+      "force_transition_to": ["deep_focus", "recharge"]
+    },
+    "collaboration": {
+      "label": "Collaboration",
+      "description": "Collaborative problem-solving, discussion, idea exchange",
+      "energy_requirement": "High",
+      "typical_duration_minutes": 60,
+      "risk_level": "Medium",
+      "feedback_loop_risk": false,
+      "note": "Calendar-driven, avoid unplanned transitions"
+    },
+    "learning_input": {
+      "label": "Learning/Input",
+      "description": "Learning new concepts, consuming information",
+      "energy_requirement": "Medium",
+      "typical_duration_minutes": 45,
+      "risk_level": "Low",
+      "feedback_loop_risk": false
+    },
+    "execution_admin": {
+      "label": "Execution (Admin)",
+      "description": "Administrative tasks, emails, logistics",
+      "energy_requirement": "Low",
+      "typical_duration_minutes": 30,
+      "risk_level": "Low",
+      "feedback_loop_risk": false
+    },
+    "transition": {
+      "label": "Transition",
+      "description": "Context switching, brief breaks between states",
+      "energy_requirement": "Very Low",
+      "typical_duration_minutes": 10,
+      "risk_level": "Low",
+      "feedback_loop_risk": false
+    }
+  },
+  "state_transitions": {
+    "early_morning": {
+      "from": "awake",
+      "to": "reflection",
+      "probability": 0.95,
+      "typical_duration": 15,
+      "description": "Morning reflection/planning is your prime ritual"
+    },
+    "morning_deep_work": {
+      "from": "reflection",
+      "to": "deep_focus",
+      "probability": 0.90,
+      "typical_duration": 120,
+      "description": "Peak focus window after planning"
+    },
+    "focus_recovery": {
+      "from": "deep_focus",
+      "to": "transition",
+      "probability": 1.0,
+      "typical_duration": 10,
+      "description": "Always transition before recharge"
+    },
+    "deep_work_recharge": {
+      "from": "transition",
+      "to": "recharge",
+      "probability": 0.95,
+      "typical_duration": 60,
+      "description": "Extended recharge needed after intense focus"
+    },
+    "recharge_next": {
+      "from": "recharge",
+      "to": "collaboration",
+      "probability": 0.50,
+      "alternate_to": "execution_admin",
+      "alternate_probability": 0.30,
+      "description": "Either collaboration or admin tasks, rarely more focus immediately"
+    },
+    "collaboration_to_recovery": {
+      "from": "collaboration",
+      "to": "recharge",
+      "probability": 0.80,
+      "description": "Collaboration drains social energy; need recovery"
+    },
+    "reflection_danger_1": {
+      "from": "reflection",
+      "to": "reflection",
+      "probability": 0.30,
+      "risk_level": "HIGH",
+      "description": "Feedback loop risk: planning paralysis",
+      "guard": "Max 45 minutes. Force transition to deep_focus or recharge."
+    },
+    "reflection_danger_2": {
+      "from": "reflection",
+      "to": "learning_input",
+      "probability": 0.20,
+      "risk_level": "MEDIUM",
+      "description": "Can consume planning time for input gathering",
+      "guard": "If >30 min total reflection time, skip to deep_focus"
+    }
+  },
+  "daily_ideal_rhythm": {
+    "morning": {
+      "time": "6:00-8:00",
+      "sequence": ["reflection", "deep_focus"],
+      "duration_minutes": 120,
+      "goal": "Strategic thinking + peak focus block"
+    },
+    "late_morning": {
+      "time": "8:00-9:00",
+      "sequence": ["transition", "recharge"],
+      "duration_minutes": 60,
+      "goal": "Extended recovery for solo thinking"
+    },
+    "midday": {
+      "time": "9:00-10:30",
+      "sequence": ["collaboration_or_admin"],
+      "duration_minutes": 90,
+      "goal": "Meetings (scheduled) or admin"
+    },
+    "afternoon": {
+      "time": "10:30-12:00",
+      "sequence": ["recharge", "learning_input_or_light_work"],
+      "duration_minutes": 90,
+      "goal": "Recovery + skill development"
+    },
+    "evening": {
+      "time": "After 12:00",
+      "sequence": ["reflection", "execution_admin", "learning"],
+      "duration_minutes": "flexible",
+      "goal": "Review, plan, wind down"
+    }
+  },
+  "feedback_loop_safeguards": {
+    "reflection_loop": {
+      "trigger": "In Reflection state > 45 minutes",
+      "warning": "Planning paralysis risk detected",
+      "action": "Force transition to Deep Focus or Recharge",
+      "rationale": "Markov chain principle: current state should determine next action, not infinite analysis"
+    },
+    "recharge_loop": {
+      "trigger": "In Recharge state > 120 minutes",
+      "warning": "Extended isolation may reduce collaboration capacity",
+      "action": "Suggest transition to collaboration or learning",
+      "rationale": "Prevent dull stable state of isolated recovery"
+    },
+    "collaboration_avoidance": {
+      "trigger": "No collaboration for > 3 days",
+      "warning": "May miss energizing peer interaction",
+      "action": "Schedule or initiate collaboration",
+      "rationale": "Collaboration is energizing even if unplanned ones drain you"
+    }
+  },
+  "state_metrics": {
+    "track_daily": [
+      "time_spent_in_each_state",
+      "actual_vs_ideal_transitions",
+      "reflection_duration",
+      "recharge_quality_rating",
+      "deep_focus_quality_rating"
+    ],
+    "analyze_weekly": [
+      "feedback_loop_incidents",
+      "transition_adherence",
+      "energy_patterns",
+      "collaboration_frequency",
+      "deep_work_output"
+    ],
+    "goal": "Match actual state transitions to ideal Markov model"
+  }
+}
