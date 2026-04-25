@@ -6,34 +6,13 @@ tags: [pca, reconciliation, agentic-screening, logic-formalization]
 status: active
 ---
 
-# PCA Cognitive Reconciliation Engine — Disagreement-Driven Agentic Screening
+# PCA Cognitive Reconciliation Engine — Agentic Screening Logic
 
 ## Overview
 
-The Cognitive Reconciliation Engine implements the **Disagreement-Driven Agentic Screening Pattern** for robust decision assurance. Rather than relying on unreliable model confidence scores, the CRE infers genuine uncertainty from **independent agent disagreement**, enabling robust contradiction detection and belief evolution.
+The Cognitive Reconciliation Engine implements the **Agentic Screening Pattern** for disagreement-driven decision assurance. Rather than relying on model confidence scores, the CRE infers uncertainty from **independent agent disagreement**, enabling robust contradiction detection and belief evolution.
 
 This formalization provides concrete decision logic, escalation rules, and human-in-the-loop controls for the reconciliation workflow.
-
-## Pattern Definition
-
-**Formal Name**: Disagreement-Driven Agentic Screening Pattern
-
-**Plain Language**: Independent AI Review with Escalation Pattern
-
-**Core Principle**: Use inter-agent disagreement (not model confidence) as the uncertainty signal for governance and escalation.
-
-### Why This Architecture Matters
-
-**Problem It Solves**: Most AI screening pipelines rely on a single model's confidence score—which is often poorly calibrated and can be confidently wrong.
-
-**Solution**: Independent parallel agents review the same input. Disagreement signals real ambiguity requiring escalation. Agreement indicates convergence.
-
-**Why It's Enterprise-Grade**:
-- **Disagreement as signal**: Agent disagreement is a more defensible proxy for ambiguity than declared model confidence
-- **Peer review analog**: Approximates dual review + adjudication (scientific review practice)
-- **Strategic human placement**: Humans reserved for ambiguous cases, not every decision
-- **Auditable triage**: Each decision traced to its pathway (auto-label, ensemble, human)
-- **Governance alignment**: Separates decision-making from uncertainty estimation
 
 ## Core Pattern: Disagreement-Driven Assurance
 
@@ -95,7 +74,6 @@ Input (New Knowledge)
 {
   "agent_type": "screening",
   "input_id": "uuid",
-  "overall_confidence": 0.0-1.0,
   "related_nodes": [
     {
       "node_id": "uuid",
@@ -115,8 +93,6 @@ Input (New Knowledge)
   "reasoning": "string"
 }
 ```
-
-**Note on overall_confidence**: Aggregate confidence across all analyzed relationships and contradictions. Used by the Agreement Gate and Auto-Label logic to determine if convergent decisions are high-enough confidence to integrate without further review.
 
 ### Critical Agent
 
@@ -189,7 +165,7 @@ IF critical_agent.final_decision == "request_clarification" THEN
 
 ## Stage 3A: Auto-Label (Agreement Path)
 
-**Triggered When**: Screening Agent and Critical Agent agree **AND** combined confidence ≥ 0.80
+**Triggered When**: Screening Agent and Critical Agent agree
 
 **Outcome**: High-confidence integration without further review
 
@@ -202,22 +178,11 @@ IF critical_agent.final_decision == "request_clarification" THEN
 
 **Confidence Formula** (Auto-Label):
 ```
-combined_confidence = 
-  (critical_agent.overall_confidence × 0.6) +
-  (screening_agent.overall_confidence × 0.4) +
+confidence = 
+  (critical_agent.confidence × 0.6) +
+  (screening_agent.confidence × 0.4) +
   convergence_bonus(+0.1 if both agents agree)
-
-auto_label_eligible = 
-  (agents_agree) AND (combined_confidence ≥ 0.80)
-
-IF auto_label_eligible THEN
-  → Integrate to graph
-  → Use combined_confidence as integration confidence
-ELSE
-  → Route to Ensemble Arbitration (disagreement or low confidence)
 ```
-
-**Critical Safeguard**: If both agents agree but combined confidence is below 0.80, escalate to Ensemble Arbitration rather than auto-labeling. This prevents low-confidence but convergent decisions from being integrated directly.
 
 **Example**:
 ```json
@@ -415,91 +380,28 @@ ensemble_consensus =
 uncertainty = 
   disagreement_rate × (1.0 - ensemble_consensus)
 
-# Escalation policy: 50-66% consensus (0.5-0.66) must escalate
-# Therefore: uncertainty >= 0.34 requires escalation
 escalation_required = 
-  uncertainty >= 0.34 OR critical_request_clarification
+  uncertainty > 0.4 OR critical_request_clarification
 ```
 
 **Interpretation**:
-- **Uncertainty = 0.0**: Perfect agent agreement (100% consensus) → Auto-label (if confidence ≥ 0.80)
-- **Uncertainty ≤ 0.34**: >66% consensus → Ensemble resolution succeeds, integrate
-- **Uncertainty 0.34-1.0**: 50-66% consensus → Escalate to human review
-- **Uncertainty = 1.0**: Complete disagreement (50/50 tie) → Definite human review
-
-**Policy Alignment**: This threshold ensures that any ensemble outcome with less than 66% consensus (50-66% range) is routed to human review per the documented escalation table.
-
-## Risk Assessment & Mitigation
-
-This is a strong architecture, but not magic. Known risks and mitigations:
-
-### Risk 1: Correlated Failure (Both Agents Wrong)
-
-**Risk**: If both agents share the same base model, prompt family, or blind spots, agreement may still be wrong.
-
-**Severity**: Medium-High (silent failure risk)
-
-**Mitigation**:
-- Diversify base models where feasible (GPT-4 + Claude, for example)
-- Use different prompt families or temperature settings
-- Document agent architecture (what model, what prompts, what settings)
-- Monitor for persistent agreement-on-wrong cases (post-human-review analysis)
-- Consider ensemble with a third independent agent for high-stakes cases
-
-### Risk 2: Ensemble Instability
-
-**Risk**: Randomized majority voting can drift if the case is poorly framed or task instructions are ambiguous.
-
-**Severity**: Low-Medium (detectable through disagreement rate tracking)
-
-**Mitigation**:
-- Track persistent disagreement classes (which topics consistently cause disagreement)
-- Refine task instructions and exclusion criteria for high-disagreement domains
-- Increase ensemble runs (N=5-7) for borderline cases
-- Add task exemplars to prompts to clarify edge cases
-- Monitor ensemble stability over time
-
-### Risk 3: Prompt Augmentation Drift
-
-**Risk**: RLHF-Lite via prompt augmentation is useful, but can become messy over time (undocumented changes, inconsistent guidance).
-
-**Severity**: Low (manageable with versioning)
-
-**Mitigation**:
-- Version all prompts (e.g., `screening-v1.2.3`)
-- Log all prompt changes with rationale
-- Test augmented prompts before promoting to production
-- Maintain a canonical "baseline" prompt for comparison
-- Review prompt drift quarterly
-
-### Risk 4: Escalation Bottleneck
-
-**Risk**: If too many cases escalate to human review, the efficiency gain collapses and the system becomes a human-annotation tool.
-
-**Severity**: Medium (operational viability concern)
-
-**Mitigation**:
-- Track disagreement rate as a platform KPI (target: <20% escalation)
-- Monitor whether disagreement rate increases over time
-- Analyze escalated cases to identify systematic failure modes
-- Invest in agent improvement (better prompts, better retrieval) for high-escalation domains
-- Set escalation budget (if >25% escalate, pause and diagnose)
+- **Uncertainty = 0.0**: Perfect agent agreement → Auto-label (high confidence)
+- **Uncertainty = 0.2-0.4**: Mild disagreement → Ensemble resolution usually succeeds
+- **Uncertainty = 0.4-0.8**: Significant disagreement → Likely human review needed
+- **Uncertainty > 0.8**: Severe disagreement → Definite human review + research task
 
 ## Implementation Checklist
 
 - [ ] Implement Screening Agent with fast retrieval (3-5 hop neighborhood)
 - [ ] Implement Critical Agent with deep analysis (full graph traversal)
-- [ ] **Add overall_confidence to both agent outputs**
-- [ ] Create Agreement Gate with confidence floor check (≥ 0.80)
+- [ ] Create Agreement Gate logic
 - [ ] Implement Ensemble Arbitration (multi-run voting)
-- [ ] **Set escalation threshold to >= 0.34 (50-66% consensus)**
 - [ ] Build Human Review interface and logging
-- [ ] Implement RLHF-Lite feedback loop with prompt versioning
-- [ ] Create audit trail logging for all decisions (including decision pathway)
-- [ ] Build monitoring dashboard (agent agreement rates, escalation frequency, disagreement classes)
-- [ ] Define prompt augmentation pipeline with change logging
+- [ ] Implement RLHF-Lite feedback loop
+- [ ] Create audit trail logging for all decisions
+- [ ] Build monitoring dashboard (agent agreement rates, escalation frequency)
+- [ ] Define prompt augmentation pipeline
 - [ ] Test disagreement patterns and resolution quality
-- [ ] **Set up risk monitoring (correlated failures, ensemble stability, prompt drift, escalation bottleneck)**
 
 ## Success Criteria
 
