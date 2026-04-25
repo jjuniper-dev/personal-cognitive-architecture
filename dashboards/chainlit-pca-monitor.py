@@ -403,6 +403,7 @@ async def start():
 Real-time monitoring of the Personal Cognitive Architecture ingestion pipeline.
 
 **Available commands:**
+- `/capture` — Create a new note (text, voice, link)
 - `/status` — Current queue and metrics
 - `/traces` — Recent pipeline traces (last 10 operations)
 - `/metrics` — Detailed performance metrics
@@ -422,7 +423,9 @@ async def main(message: cl.Message):
     """Main message handler"""
     command = message.content.lower().strip()
 
-    if command == "/status":
+    if command == "/capture":
+        await handle_capture()
+    elif command == "/status":
         await handle_status()
     elif command == "/traces":
         await handle_traces()
@@ -440,8 +443,116 @@ async def main(message: cl.Message):
         await handle_graph()
     else:
         await cl.Message(
-            content=f"❓ Unknown command: `{command}`\n\nAvailable commands: `/status`, `/traces`, `/metrics`, `/cost`, `/accuracy`, `/agents`, `/watch`, `/graph`"
+            content=f"❓ Unknown command: `{command}`\n\nAvailable commands: `/capture`, `/status`, `/traces`, `/metrics`, `/cost`, `/accuracy`, `/agents`, `/watch`, `/graph`"
         ).send()
+
+
+async def handle_capture():
+    """Interactive capture form for new notes"""
+    await cl.Message(content="📝 **Create a new capture**\n\nLet's gather some information...").send()
+
+    try:
+        # Ask for capture type
+        capture_type_response = await cl.AskChoiceMessage(
+            content="What type of capture?",
+            choices=["Quick thought", "Voice note summary", "Article/Link", "Other"]
+        ).send()
+        capture_type = capture_type_response.get("value", "Quick thought").lower()
+
+        # Map to source_type
+        source_type_map = {
+            "quick thought": "text",
+            "voice note summary": "voice",
+            "article/link": "article",
+            "other": "text"
+        }
+        source_type = source_type_map.get(capture_type, "text")
+
+        # Ask for content
+        content_msg = await cl.AskUserMessage(
+            content="What's the content? (text or summary)"
+        ).send()
+        content = content_msg.get("output", "")
+
+        if not content:
+            await cl.Message(content="❌ Content is required").send()
+            return
+
+        # Ask for domain
+        domain_msg = await cl.AskUserMessage(
+            content="Domain? (e.g., AI-Safety, Research, Projects, or leave blank)"
+        ).send()
+        domain = domain_msg.get("output", "").strip()
+
+        # Ask for tags
+        tags_msg = await cl.AskUserMessage(
+            content="Tags? (comma-separated, optional)"
+        ).send()
+        tags_input = tags_msg.get("output", "").strip()
+        tags = [t.strip() for t in tags_input.split(",") if t.strip()]
+
+        # Ask for sensitivity
+        sensitivity_response = await cl.AskChoiceMessage(
+            content="Sensitivity level?",
+            choices=["public", "private", "sensitive"]
+        ).send()
+        sensitivity = sensitivity_response.get("value", "public").lower()
+
+        # Generate timestamp
+        timestamp = datetime.now().isoformat()
+        timestamp_formatted = datetime.now().strftime("%Y-%m-%dT%H%M%S")
+
+        # Build markdown with frontmatter
+        tags_str = ", ".join(tags) if tags else ""
+        markdown_content = f"""---
+type: capture
+source_type: {source_type}
+created: {timestamp}
+domain: {domain}
+sensitivity: {sensitivity}
+tags: [{tags_str}]
+confidence: 0.5
+---
+
+# Capture
+
+{content}
+"""
+
+        # Generate filename
+        domain_slug = domain.lower().replace(" ", "-") if domain else "untagged"
+        filename = f"capture-{timestamp_formatted}-{domain_slug}.md"
+
+        # Ensure directory exists
+        capture_dir = VAULT_PATH / "20-Ideas" / "Unstructured"
+        capture_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save file
+        file_path = capture_dir / filename
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+
+        # Confirmation message
+        await cl.Message(
+            content=f"""
+✅ **Capture saved!**
+
+- **File**: `{filename}`
+- **Location**: `20-Ideas/Unstructured/`
+- **Type**: {source_type}
+- **Domain**: {domain if domain else "(none)"}
+- **Tags**: {", ".join(tags) if tags else "(none)"}
+
+**Next steps:**
+1. iCloud sync will push to Obsidian (~10s)
+2. n8n will detect and validate
+3. Dashboard will show in `/traces` within 30s
+4. Type `/watch` to see it flow through the pipeline
+"""
+        ).send()
+
+    except Exception as e:
+        await cl.Message(content=f"❌ Error creating capture: {str(e)}").send()
 
 
 async def handle_status():

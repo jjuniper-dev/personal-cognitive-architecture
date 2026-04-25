@@ -71,6 +71,44 @@ chainlit run chainlit-pca-monitor.py
 
 ### Available Commands
 
+#### `/capture`
+Create a new note directly from the dashboard.
+
+```
+📝 Create a new capture
+
+What type of capture?
+  → Quick thought
+  → Voice note summary
+  → Article/Link
+  → Other
+
+What's the content?
+  → "AI safety concerns around reward hacking"
+
+Domain?
+  → "AI-Safety"
+
+Tags?
+  → "research, urgent"
+
+Sensitivity level?
+  → public / private / sensitive
+
+✅ Capture saved!
+- File: capture-2026-04-25T143000-AI-Safety.md
+- Location: 20-Ideas/Unstructured/
+- Type: text
+- Domain: AI-Safety
+- Tags: research, urgent
+
+Next steps:
+1. iCloud sync will push to Obsidian (~10s)
+2. n8n will detect and validate
+3. Dashboard will show in /traces within 30s
+4. Type /watch to see it flow through the pipeline
+```
+
 #### `/status`
 Show current queue status and key metrics.
 
