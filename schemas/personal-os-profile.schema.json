@@ -1,0 +1,237 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Personal OS Profile",
+  "description": "Defines an individual's cognitive operating system characteristics",
+  "type": "object",
+  "required": [
+    "name",
+    "personal_os",
+    "date_profiled"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Profile owner name"
+    },
+    "date_profiled": {
+      "type": "string",
+      "format": "date",
+      "description": "Last profiling date (YYYY-MM-DD)"
+    },
+    "personal_os": {
+      "type": "object",
+      "description": "Core Personal OS dimensions",
+      "required": [
+        "attention_model",
+        "processing_mode",
+        "decision_style",
+        "energy_profile",
+        "structure_tolerance",
+        "social_bandwidth"
+      ],
+      "properties": {
+        "attention_model": {
+          "type": "string",
+          "enum": [
+            "sequential",
+            "parallel",
+            "reactive"
+          ],
+          "description": "How cognitive focus is allocated across tasks"
+        },
+        "processing_mode": {
+          "type": "string",
+          "enum": [
+            "internal",
+            "external",
+            "hybrid"
+          ],
+          "description": "Where cognition happens most efficiently"
+        },
+        "decision_style": {
+          "type": "string",
+          "enum": [
+            "real_time",
+            "batch",
+            "deliberative"
+          ],
+          "description": "Temporal preference for decision-making"
+        },
+        "energy_profile": {
+          "type": "string",
+          "enum": [
+            "steady",
+            "burst",
+            "volatile"
+          ],
+          "description": "How cognitive energy operates over time"
+        },
+        "structure_tolerance": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "Preference for and resilience to structure"
+        },
+        "social_bandwidth": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "Capacity for synchronous social interaction"
+        }
+      }
+    },
+    "firmware_notes": {
+      "type": "object",
+      "description": "Immutable baseline characteristics (for reference)",
+      "properties": {
+        "baseline_energy_level": {
+          "type": "string",
+          "enum": [
+            "very_low",
+            "low",
+            "medium",
+            "high",
+            "very_high"
+          ]
+        },
+        "sensory_sensitivity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "introversion_extroversion": {
+          "type": "string",
+          "enum": [
+            "introverted",
+            "ambivert",
+            "extroverted"
+          ]
+        }
+      }
+    },
+    "native_workloads": {
+      "type": "array",
+      "description": "Workload types aligned with this OS",
+      "items": {
+        "type": "string",
+        "enum": [
+          "deep_work",
+          "collaborative_work",
+          "creative_exploration",
+          "routine_execution",
+          "interrupt_driven",
+          "meta_work"
+        ]
+      }
+    },
+    "adapted_workloads": {
+      "type": "array",
+      "description": "Workload types with medium cost (adapted mode)",
+      "items": {
+        "type": "string",
+        "enum": [
+          "deep_work",
+          "collaborative_work",
+          "creative_exploration",
+          "routine_execution",
+          "interrupt_driven",
+          "meta_work"
+        ]
+      }
+    },
+    "emulated_workloads": {
+      "type": "array",
+      "description": "Workload types with high cost (emulated mode, unsustainable long-term)",
+      "items": {
+        "type": "string",
+        "enum": [
+          "deep_work",
+          "collaborative_work",
+          "creative_exploration",
+          "routine_execution",
+          "interrupt_driven",
+          "meta_work"
+        ]
+      }
+    },
+    "daily_compute_budget": {
+      "type": "number",
+      "description": "Total cognitive compute-minutes available per day (default: 480 for 8-hour day)",
+      "minimum": 60,
+      "default": 480
+    },
+    "context_switch_tolerance": {
+      "type": "integer",
+      "description": "Maximum acceptable context switches per hour before performance degradation",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "meeting_density_tolerance": {
+      "type": "integer",
+      "description": "Maximum consecutive synchronous meeting hours before recovery needed",
+      "minimum": 1,
+      "maximum": 8
+    },
+    "recovery_time_ratio": {
+      "type": "number",
+      "description": "Hours of recovery needed per hour of emulated workload (e.g., 1:1 = 1 hour recovery per hour worked)",
+      "minimum": 0.5,
+      "maximum": 4.0,
+      "default": 1.0
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form observations about your OS and preferred working patterns"
+    },
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "default": "1.0"
+    }
+  },
+  "examples": [
+    {
+      "name": "Alice Chen",
+      "date_profiled": "2025-02-15",
+      "personal_os": {
+        "attention_model": "sequential",
+        "processing_mode": "internal",
+        "decision_style": "deliberative",
+        "energy_profile": "burst",
+        "structure_tolerance": "medium",
+        "social_bandwidth": "low"
+      },
+      "firmware_notes": {
+        "baseline_energy_level": "high",
+        "sensory_sensitivity": "high",
+        "introversion_extroversion": "introverted"
+      },
+      "native_workloads": [
+        "deep_work",
+        "meta_work"
+      ],
+      "adapted_workloads": [
+        "routine_execution",
+        "creative_exploration"
+      ],
+      "emulated_workloads": [
+        "interrupt_driven",
+        "collaborative_work"
+      ],
+      "daily_compute_budget": 480,
+      "context_switch_tolerance": 3,
+      "meeting_density_tolerance": 3,
+      "recovery_time_ratio": 1.5,
+      "notes": "Protect focus time for deep work. Batch meetings into 2-hour blocks with recovery after. High sensory sensitivity means prefer written over verbal communication."
+    }
+  ]
+}
