@@ -173,6 +173,28 @@ Integration Worker (Storage)
 └─ Triggered: 43
 ```
 
+#### `/graph`
+Interactive knowledge graph visualization of all captured notes and their relationships.
+
+```
+🔗 Knowledge Graph (Interactive)
+
+- Nodes: 142
+- Relationships: 287
+
+Node Types:
+- Note: 89
+- Concept: 38
+- Person: 15
+
+Tips:
+- Drag nodes to move them around
+- Click and drag the background to pan
+- Scroll to zoom
+- Use "Fit to View" to see the entire graph
+- Use "Stabilize" to arrange nodes more organically
+```
+
 #### `/watch`
 Live updates with 5-second auto-refresh for 1 minute.
 
@@ -187,6 +209,37 @@ Cost: $0.48 | Success: 92.0%
 ```
 
 ## Data Sources
+
+### Neo4j Knowledge Graph
+
+The `/graph` command displays an interactive visualization of the PCA knowledge graph stored in Neo4j.
+
+**Setup**:
+```bash
+# 1. Install Neo4j (Community Edition or higher)
+# Visit: https://neo4j.com/download/
+
+# 2. Start Neo4j
+neo4j start
+
+# 3. Verify connection
+# Dashboard will auto-connect when /graph command is used
+
+# 4. Seed with Obsidian data (optional)
+# Use pca-orchestrator agent to sync vault to Neo4j
+```
+
+**Graph Structure**:
+- **Nodes**: Notes, Concepts, People (extracted from captured content)
+- **Relationships**: related-to, depends-on, contradicts, extends
+- **Properties**: confidence scores, domains, project tags
+
+**Query Options** (Future):
+- Filter by project
+- Filter by domain
+- Show contradictions only
+- Impact analysis (what changes if I update X?)
+- Knowledge gaps (what's missing?)
 
 ### Audit Logs
 
@@ -307,12 +360,54 @@ The dashboard tracks against these targets:
 2. Verify model selection logic in n8n workflow
 3. Review recent traces (`/traces`) to see which operations are costly
 
+## Neo4j Integration
+
+### Neo4j Client API
+
+The `dashboards/utils/neo4j_client.py` module provides a Python interface to Neo4j:
+
+```python
+from utils.neo4j_client import Neo4jClient
+
+client = Neo4jClient(uri="neo4j://localhost:7687", username="neo4j")
+client.connect()
+
+# Get full knowledge graph
+nodes, relationships = client.get_knowledge_graph(limit=100)
+
+# Get project-specific subgraph
+project_nodes, project_rels = client.get_project_graph("PATH-HAIL")
+
+# Find contradictions
+contradictions = client.get_contradictions()
+
+# Analyze impact of changes
+related_nodes, related_rels = client.get_related_notes(note_id="550e8400", depth=3)
+
+# Get domain-specific graph
+domain_nodes, domain_rels = client.get_domain_graph("AI-Safety")
+
+# Get statistics
+stats = client.get_stats()
+# Returns: {total_nodes, total_relationships, total_projects}
+```
+
+### Neovis.js Visualization
+
+The `/graph` command uses Neovis.js (vis-network library) to render an interactive visualization with:
+- **Physics-based layout**: Nodes repel each other, connected nodes attract
+- **Interactive controls**: Zoom, pan, drag nodes, fit to view
+- **Type-based coloring**: Different colors for Note/Concept/Person nodes
+- **Directional edges**: Arrows show relationship direction
+
 ## Future Enhancements
 
 ### Phase 2 Dashboard
 
-- [ ] Real-time Neo4j graph visualization (knowledge relationships)
-- [ ] Feedback loop integration (show user corrections)
+- [ ] Graph filtering options (by project, domain, relationship type)
+- [ ] Contradiction highlighting (show conflicting knowledge edges in red)
+- [ ] Impact analysis visualization (highlight cascade of changes)
+- [ ] Feedback loop integration (show user corrections on graph)
 - [ ] Weight sensitivity analysis (which scoring weights matter most?)
 - [ ] A/B testing dashboard (compare old vs. new weights)
 - [ ] Custom alerts (set thresholds for metrics)
@@ -323,6 +418,8 @@ The dashboard tracks against these targets:
 - [ ] Historical trends (30-day, 90-day, yearly views)
 - [ ] Anomaly detection (alert on unusual patterns)
 - [ ] Export to Grafana or Datadog
+- [ ] Neo4j query builder (drag-and-drop graph queries)
+- [ ] Knowledge gap detection (suggest missing connections)
 
 ## Architecture Notes
 

@@ -15,10 +15,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 import re
+from utils.neo4j_client import Neo4jClient
 
 # Configuration
 AUDIT_LOG_PATH = Path.home() / "personal-cognitive-architecture" / "audit-logs"
 VAULT_PATH = Path.home() / "obsidian-vault"
+NEO4J_URI = "neo4j://localhost:7687"
+NEO4J_USER = "neo4j"
 REFRESH_INTERVAL_SECONDS = 5
 
 
@@ -46,6 +49,9 @@ class PCADashboard:
             },
         }
         self.current_operations = []
+        self.neo4j_client = Neo4jClient(
+            uri=NEO4J_URI, username=NEO4J_USER
+        )
 
     async def load_audit_logs(self, hours: int = 24) -> List[Dict]:
         """Load audit logs from last N hours"""
@@ -235,6 +241,154 @@ class PCADashboard:
 """
         return summary
 
+    def generate_neovis_html(
+        self, nodes: List[Dict], relationships: List[Dict], title: str = "Knowledge Graph"
+    ) -> str:
+        """Generate HTML for Neovis.js graph visualization"""
+        nodes_json = json.dumps(nodes)
+        rels_json = json.dumps(relationships)
+
+        html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f5f5f5;
+        }}
+        #network {{
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }}
+        .controls {{
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }}
+        .controls button {{
+            padding: 8px 12px;
+            margin-right: 8px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }}
+        .controls button:hover {{
+            background: #0052a3;
+        }}
+        .stats {{
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="zoomToFit()">Fit to View</button>
+        <button onclick="stabilize()">Stabilize</button>
+        <button onclick="togglePhysics()">Toggle Physics</button>
+        <div class="stats">
+            Nodes: {len(nodes)} | Relationships: {len(relationships)}
+        </div>
+    </div>
+    <div id="network"></div>
+
+    <script>
+        var nodes = new vis.DataSet({nodes_json});
+        var edges = new vis.DataSet({rels_json});
+
+        var data = {{
+            nodes: nodes,
+            edges: edges
+        }};
+
+        var options = {{
+            physics: {{
+                enabled: true,
+                barnesHut: {{
+                    gravitationalConstant: -26000,
+                    centralGravity: 0.3,
+                    springLength: 200
+                }},
+                maxVelocity: 50,
+                minVelocity: 0.75,
+                solver: "barnesHut",
+                timestep: 0.5
+            }},
+            nodes: {{
+                shape: "dot",
+                scaling: {{
+                    label: {{
+                        enabled: true,
+                        min: 14,
+                        max: 30
+                    }}
+                }},
+                font: {{
+                    size: 16,
+                    color: "#333"
+                }}
+            }},
+            edges: {{
+                arrows: "to",
+                color: {{color: "#bbb", highlight: "#0066cc"}},
+                smooth: {{type: "continuous"}},
+                font: {{
+                    size: 12,
+                    color: "#666"
+                }}
+            }},
+            interaction: {{
+                navigationButtons: true,
+                keyboard: true,
+                zoomView: true,
+                dragView: true
+            }}
+        }};
+
+        var container = document.getElementById("network");
+        var network = new vis.Network(container, data, options);
+
+        function zoomToFit() {{
+            network.fit({{animation: true}});
+        }}
+
+        function stabilize() {{
+            network.physics.stabilize();
+        }}
+
+        var physicsEnabled = true;
+        function togglePhysics() {{
+            physicsEnabled = !physicsEnabled;
+            network.physics.enabled = physicsEnabled;
+        }}
+
+        // Auto-fit on load
+        setTimeout(function() {{
+            network.fit({{animation: true}});
+        }}, 500);
+    </script>
+</body>
+</html>
+"""
+        return html
+
 
 dashboard = PCADashboard()
 
@@ -256,6 +410,7 @@ Real-time monitoring of the Personal Cognitive Architecture ingestion pipeline.
 - `/accuracy` — Routing accuracy and calibration
 - `/agents` — Agent activity summary
 - `/watch` — Live updates (auto-refresh every 5s)
+- `/graph` — Interactive knowledge graph visualization
 
 Type any command to get started.
 """
@@ -281,9 +436,11 @@ async def main(message: cl.Message):
         await handle_agents()
     elif command == "/watch":
         await handle_watch()
+    elif command == "/graph":
+        await handle_graph()
     else:
         await cl.Message(
-            content=f"❓ Unknown command: `{command}`\n\nAvailable commands: `/status`, `/traces`, `/metrics`, `/cost`, `/accuracy`, `/agents`, `/watch`"
+            content=f"❓ Unknown command: `{command}`\n\nAvailable commands: `/status`, `/traces`, `/metrics`, `/cost`, `/accuracy`, `/agents`, `/watch`, `/graph`"
         ).send()
 
 
@@ -446,6 +603,62 @@ Cost: ${metrics['daily_cost']:.2f} | Success: {metrics['success_rate']:.1f}%
     await cl.Message(
         content="✅ Live updates completed. Use `/watch` again for another minute."
     ).send()
+
+
+async def handle_graph():
+    """Show knowledge graph visualization"""
+    await cl.Message(content="🔗 Loading knowledge graph...").send()
+
+    try:
+        if not dashboard.neo4j_client.connect():
+            await cl.Message(
+                content="⚠️ Could not connect to Neo4j. Ensure Neo4j is running at "
+                + f"{NEO4J_URI}"
+            ).send()
+            return
+
+        nodes, relationships = dashboard.neo4j_client.get_knowledge_graph(limit=100)
+        dashboard.neo4j_client.disconnect()
+
+        if not nodes:
+            await cl.Message(
+                content="📭 No nodes found in knowledge graph. Start capturing to populate the graph."
+            ).send()
+            return
+
+        html = dashboard.generate_neovis_html(nodes, relationships, "PCA Knowledge Graph")
+        await cl.HTML(html).send()
+
+        stats = f"""
+### 📊 Graph Statistics
+
+- **Nodes**: {len(nodes)}
+- **Relationships**: {len(relationships)}
+
+**Node Types**:
+"""
+        type_counts = {}
+        for node in nodes:
+            node_type = node.get("type", "Unknown")
+            type_counts[node_type] = type_counts.get(node_type, 0) + 1
+
+        for node_type, count in sorted(type_counts.items()):
+            stats += f"\n- {node_type}: {count}"
+
+        stats += """
+
+**Tips**:
+- Drag nodes to move them around
+- Click and drag the background to pan
+- Scroll to zoom
+- Use "Fit to View" to see the entire graph
+- Use "Stabilize" to arrange nodes more organically
+"""
+        await cl.Message(content=stats).send()
+    except Exception as e:
+        await cl.Message(
+            content=f"❌ Error loading knowledge graph: {str(e)}\n\nEnsure Neo4j is running and contains knowledge graph data."
+        ).send()
 
 
 if __name__ == "__main__":
