@@ -24,6 +24,12 @@ The CRE serves three critical functions:
 2. **Relationship Detection** — Identify reinforcement, contradictions, gaps, and novel contributions
 3. **Model Evolution** — Update confidence levels, restructure beliefs, and trigger deeper analysis when needed
 
+## Implementation Approach
+
+The CRE implements the **Agentic Screening Pattern** for disagreement-driven decision assurance. Rather than relying solely on model confidence scores, the CRE infers genuine uncertainty from **independent agent disagreement**, enabling robust contradiction detection and belief evolution.
+
+See **[pca-cre-agentic-screening-logic.md](pca-cre-agentic-screening-logic.md)** for complete logic formalization, decision trees, escalation rules, and implementation guidance.
+
 ## Core Responsibilities
 
 The CRE is responsible for:
