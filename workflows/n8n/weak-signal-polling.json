@@ -1,0 +1,140 @@
+{
+  "name": "Weak Signal Polling & Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "unit": "hours",
+        "interval": 1
+      },
+      "id": "3a7c4e2b-9d1f-4a6c-8e9f-1b2c3d4e5f6a",
+      "name": "Trigger: Hourly Signal Poll",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "cd {{ $env.PCA_ROOT }}/external/weak-signal-finder && python main.py",
+        "timeout": 900
+      },
+      "id": "4b8d5f3c-2e4a-5b7d-9f0a-2c3d4e5f6g7h",
+      "name": "Execute: WeakSignalFinder",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ],
+      "credentials": {
+        "local": "local"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const fs = require('fs');\nconst path = require('path');\nconst { execSync } = require('child_process');\n\n// Poll for latest signal file\nconst wsf_dir = path.join(process.env.PCA_ROOT, 'external/weak-signal-finder/dataset');\n\ntry {\n  const files = fs.readdirSync(wsf_dir)\n    .filter(f => f.startsWith('signals_') && f.endsWith('.json'))\n    .sort()\n    .reverse();\n  \n  if (files.length === 0) {\n    return [{\"signal_file\": null, \"error\": \"No signal files found\"}];\n  }\n  \n  const latestFile = path.join(wsf_dir, files[0]);\n  const signal_data = JSON.parse(fs.readFileSync(latestFile, 'utf-8'));\n  \n  return [{\"signal_file\": files[0], \"data\": signal_data}];\n} catch (error) {\n  return [{\"error\": error.message}];\n}"
+      },
+      "id": "5c9e6g4d-3f5b-6c8e-0a1b-3d4e5f6g7h8i",
+      "name": "Process: Extract Latest Signal",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/capture-ingest",
+        "method": "POST",
+        "headerParametersJson": "{\"Content-Type\": \"application/json\"}",
+        "bodyParametersJson": "{\n  \"source_type\": \"rss-signal\",\n  \"source_system\": \"weak-signal-finder\",\n  \"content_type\": \"signal-trends\",\n  \"timestamp\": \"{{ $node[\\\"Process: Extract Latest Signal\\\"].json.data.timestamp }}\",\n  \"data\": \"{{ JSON.stringify($node[\\\"Process: Extract Latest Signal\\\"].json.data) }}\",\n  \"metadata\": {\n    \"file\": \"{{ $node[\\\"Process: Extract Latest Signal\\\"].json.signal_file }}\",\n    \"article_count\": \"{{ $node[\\\"Process: Extract Latest Signal\\\"].json.data.sources.count }}\",\n    \"languages\": \"{{ JSON.stringify($node[\\\"Process: Extract Latest Signal\\\"].json.data.sources.languages) }}\"\n  }\n}"
+      },
+      "id": "6d0f7h5e-4g6c-7d9f-1b2c-4e5f6g7h8i9j",
+      "name": "Send: To Capture Worker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Log signal ingestion\nconst { statusCode, body } = $input.item.json;\n\nreturn [{\n  \"status\": \"signal_ingested\",\n  \"http_status\": statusCode,\n  \"response\": body,\n  \"timestamp\": new Date().toISOString()\n}];"
+      },
+      "id": "7e1g8i6f-5h7d-8e0g-2c3d-5f6g7h8i9j0k",
+      "name": "Log: Ingestion Result",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Trigger: Hourly Signal Poll": {
+      "main": [
+        [
+          {
+            "node": "Execute: WeakSignalFinder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute: WeakSignalFinder": {
+      "main": [
+        [
+          {
+            "node": "Process: Extract Latest Signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process: Extract Latest Signal": {
+      "main": [
+        [
+          {
+            "node": "Send: To Capture Worker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send: To Capture Worker": {
+      "main": [
+        [
+          {
+            "node": "Log: Ingestion Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d41d8cd98f00b204e9800998ecf8427e",
+  "meta": {
+    "instanceId": "3b3c96cd47e4c1d1fb60567e3b20f33a"
+  },
+  "id": "2f3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
+  "tags": [
+    "signal-detection",
+    "weak-signals",
+    "rss-feeds",
+    "pca-integration"
+  ],
+  "description": "Polls WeakSignalFinder output hourly and ingests emerging trend signals into PCA Capture pipeline"
+}
