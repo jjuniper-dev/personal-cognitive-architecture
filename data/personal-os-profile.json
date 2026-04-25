@@ -23,6 +23,17 @@
     "energy_cost_execution": "high (draining, requires sustained discipline)",
     "natural_pattern": "Design depletes budget slowly; execution depletes fast"
   },
+  "cognitive_context_switching": {
+    "thinking_pattern": "layered abstractions",
+    "what_this_means": "holding multiple layers of mental models simultaneously",
+    "context_switch_cost": "EXTREMELY HIGH",
+    "why": "context switch breaks the layered abstraction layers being held in working memory",
+    "recovery_per_switch": "10-15 minutes to rebuild mental models",
+    "tolerance_per_hour": "1-2 switches max (not 2-3 as originally estimated)",
+    "true_cost": "Each switch loses the abstraction layer; must rebuild from scratch",
+    "phone_interruption_cost": "HIGH (completely breaks layer; phone can't be in peripheral awareness)",
+    "meeting_context_switch": "CATASTROPHIC (you lose the design layer; need 30min+ to rebuild)"
+  },
   "firmware_notes": {
     "baseline_energy_level": "high",
     "peak_focus_window": "6-10am",
@@ -60,7 +71,7 @@
   "peak_focus_hours": 4,
   "afternoon_decline_starts": "10am",
   "overstimulation_boundary": "3pm",
-  "context_switch_tolerance": 2,
+  "context_switch_tolerance": 1,
   "meeting_density_tolerance": 1,
   "meeting_anxiety_impact": "high",
   "meeting_recovery_time_minimum_hours": 2,
