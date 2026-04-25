@@ -15,6 +15,14 @@
     "severity": "high",
     "recovery_requirement": "extended (2-4 hours minimum)"
   },
+  "work_mode_imbalance": {
+    "strength": "design (systems, architecture, strategy, problem formulation)",
+    "weakness": "execution (repetitive loops, ongoing maintenance, sustained execution)",
+    "imbalance": "high",
+    "energy_cost_design": "low (energizing, focuses naturally)",
+    "energy_cost_execution": "high (draining, requires sustained discipline)",
+    "natural_pattern": "Design depletes budget slowly; execution depletes fast"
+  },
   "firmware_notes": {
     "baseline_energy_level": "high",
     "peak_focus_window": "6-10am",
@@ -24,13 +32,22 @@
     "introversion_extroversion": "introverted"
   },
   "native_workloads": [
-    "deep_work"
+    "system_design",
+    "architecture",
+    "strategic_problem_formulation",
+    "novel_problem_solving",
+    "deep_design_work"
   ],
   "adapted_workloads": [
-    "routine_execution",
-    "meta_work"
+    "meta_work",
+    "planning",
+    "short_term_execution_sprints"
   ],
   "emulated_workloads": [
+    "repetitive_execution_loops",
+    "ongoing_maintenance",
+    "sustained_operational_work",
+    "routine_execution",
     "interrupt_driven",
     "collaborative_work",
     "meetings",
