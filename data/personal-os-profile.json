@@ -7,7 +7,13 @@
     "decision_style": "batch",
     "energy_profile": "burst",
     "structure_tolerance": "low",
-    "social_bandwidth": "medium"
+    "social_bandwidth": "low"
+  },
+  "anxiety_profile": {
+    "trigger": "meetings and bilaterals",
+    "impact": "cannot focus on anything else until meeting is over",
+    "severity": "high",
+    "recovery_requirement": "extended (2-4 hours minimum)"
   },
   "firmware_notes": {
     "baseline_energy_level": "high",
@@ -22,11 +28,13 @@
   ],
   "adapted_workloads": [
     "routine_execution",
-    "meta_work",
-    "collaborative_work_in_batches"
+    "meta_work"
   ],
   "emulated_workloads": [
     "interrupt_driven",
+    "collaborative_work",
+    "meetings",
+    "bilaterals",
     "prolonged_meetings",
     "creative_exploration_under_time_pressure"
   ],
@@ -36,8 +44,10 @@
   "afternoon_decline_starts": "10am",
   "overstimulation_boundary": "3pm",
   "context_switch_tolerance": 2,
-  "meeting_density_tolerance": 2,
-  "recovery_time_ratio": 2.0,
+  "meeting_density_tolerance": 1,
+  "meeting_anxiety_impact": "high",
+  "meeting_recovery_time_minimum_hours": 2,
+  "recovery_time_ratio": 3.0,
   "phone_windows": [
     {
       "start": "10:15am",
@@ -90,10 +100,26 @@
       "windows": "10:15am, 12:30pm, 2:30pm (15 min each)",
       "outside_windows": "Phone inaccessible (kitchen, drawer, airplane mode)",
       "rationale": "Phone usage spikes as focus breaks down; batching prevents constant checking"
+    },
+    "anxiety_management": {
+      "trigger": "meetings and bilaterals",
+      "impact": "cannot focus on anything until meeting is over",
+      "strategy": "minimize total meeting load + mandatory recovery blocks",
+      "actions": [
+        "Max 1 meeting/bilateral per day (2-3 per week)",
+        "No back-to-back meetings; minimum 2-hour recovery between",
+        "Batch all meetings into single morning slot if possible (e.g., 11am-12pm)",
+        "Schedule 2-4 hour recovery block immediately after meeting",
+        "During recovery: offline, no decisions, light activities only",
+        "Day with meetings: abandon deep work goals; focus on recovery",
+        "Pre-meeting: 30 min prep/grounding (breathing, planning, familiarity)",
+        "Post-meeting: 30 min decompression (walk, notes, offline)"
+      ],
+      "violation_cost": "Anxiety spiral; cannot focus on anything; day is lost; recovery extends to next day"
     }
   },
-  "daily_schedule_recommendation": "Option A: Protect Peak",
-  "daily_schedule": {
+  "daily_schedule_recommendation": "NO-MEETING DAYS: Option A (Protect Peak). MEETING DAYS: Modified schedule (see below)",
+  "daily_schedule_no_meetings": {
     "6am-10am": {
       "activity": "DEEP WORK BLOCK (your golden 4 hours)",
       "workload_type": "deep_work",
@@ -120,8 +146,7 @@
       "task_examples": [
         "Email triage (30 min)",
         "Administrative tasks (30 min)",
-        "One meeting if necessary (60 min max)",
-        "Planning/brief collaborative work"
+        "Planning/meta-work"
       ],
       "context_switches_allowed": "1-2 per hour OK",
       "compute_cost": "160 minutes (80 min/hour × 2 hours)"
@@ -138,14 +163,13 @@
       "compute_cost": "0 minutes (recovery time)"
     },
     "1pm-3pm": {
-      "activity": "COLLABORATIVE or ROUTINE WORK",
-      "workload_type": "collaborative_work + routine_execution",
+      "activity": "ROUTINE or LIGHT WORK",
+      "workload_type": "routine_execution",
       "os_fit": "adapted",
       "task_examples": [
-        "Team meetings (up to 2 hours total)",
         "Async work (writing, reviewing documents)",
         "Planning/meta-work",
-        "1-2 context switches OK"
+        "Routine admin"
       ],
       "context_switches_allowed": "2-3 per hour OK",
       "compute_cost": "160 minutes (80 min/hour × 2 hours)"
@@ -176,6 +200,82 @@
       "compute_cost": "0 minutes"
     }
   },
+  "daily_schedule_meeting_days": {
+    "6am-11am": {
+      "activity": "DEEP WORK BLOCK (pre-meeting focus)",
+      "workload_type": "deep_work",
+      "os_fit": "native",
+      "task_examples": [
+        "Focus on high-priority work",
+        "Get something meaningful done before anxiety hits"
+      ],
+      "rules": [
+        "Offline mode: notifications OFF",
+        "Single task only",
+        "Stop work at 10:45am to prep for meeting",
+        "Take 15 min break before meeting (breathing, grounding)"
+      ],
+      "compute_cost": "300 minutes (5 hours × 60 min/hr)"
+    },
+    "11am-12pm": {
+      "activity": "MEETING/BILATERAL",
+      "workload_type": "meeting",
+      "os_fit": "emulated",
+      "task_examples": [
+        "1-on-1 bilateral",
+        "Team meeting",
+        "Collaborative discussion"
+      ],
+      "anxiety_level": "HIGH (cannot focus on anything else until over)",
+      "duration": "max 60 minutes",
+      "compute_cost": "120 minutes (high anxiety + social cost)"
+    },
+    "12pm-4pm": {
+      "activity": "MANDATORY RECOVERY BLOCK (2-4 hours minimum)",
+      "workload_type": "recovery + decompression",
+      "os_fit": "none (intentional recovery from anxiety)",
+      "task_examples": [
+        "Walk outside (30-60 min, away from phone/email)",
+        "Lunch (away from desk)",
+        "Gentle admin or routine tasks ONLY",
+        "Absolutely NO decision-making",
+        "Absolutely NO focus-intensive work"
+      ],
+      "rules": [
+        "Phone: turned off or in drawer",
+        "Slack/email: not opened",
+        "Tasks: simple, mechanical only (no thinking)",
+        "If still anxious at 2pm: extend recovery",
+        "Goal: return to baseline, not accomplish work"
+      ],
+      "why": "Anxiety from meeting prevents focus on anything else. Recovery is not optional; it's mandatory.",
+      "compute_cost": "0 minutes (recovery time, not work time)"
+    },
+    "4pm-5pm": {
+      "activity": "LIGHT ROUTINE (if recovered) or STOP",
+      "workload_type": "routine_execution or recovery",
+      "os_fit": "adapted or rest",
+      "task_examples": [
+        "If recovered: light email responses",
+        "If still anxious: continue recovery (walk, read, offline)",
+        "Simple tasks only"
+      ],
+      "depth_allowed": "None; no thinking required",
+      "compute_cost": "0-80 minutes (if working: light work only)"
+    },
+    "5pm+": {
+      "activity": "OFF (rest and recovery)",
+      "workload_type": "personal_time",
+      "os_fit": "recovery",
+      "task_examples": [
+        "Personal activities",
+        "Family time",
+        "Outdoor activities (beneficial for anxiety recovery)",
+        "No work"
+      ],
+      "compute_cost": "0 minutes"
+    }
+  },
   "workload_routing": {
     "deep_work": {
       "route_to": "6-10am window",
@@ -201,17 +301,33 @@
         "Administrative tasks"
       ]
     },
-    "collaborative_work": {
-      "route_to": "1pm-3pm (batched)",
+    "meetings_and_bilaterals": {
+      "route_to": "STRICTLY LIMITED to 1 per day (2-3 per week)",
+      "fit": "emulated",
+      "time_needed": "60 min meeting + 2-4 hours recovery",
+      "cost_per_hour": 120,
+      "total_cost_per_meeting": "120 min meeting + 120-240 min recovery = 240-360 min total",
+      "anxiety_impact": "HIGH - cannot focus on anything else until meeting is over",
+      "max_per_week": "2-3 meetings",
+      "examples": [
+        "1-on-1 bilateral",
+        "Team standup",
+        "All-hands meeting",
+        "Design review with live discussion"
+      ],
+      "strategy": "Minimize total meeting load. Batch when possible (e.g., all meetings in one morning). Mandatory recovery after each."
+    },
+    "collaborative_work_async": {
+      "route_to": "1pm-3pm (only on no-meeting days)",
       "fit": "adapted",
       "time_needed": "60min blocks max",
       "cost_per_hour": 80,
       "examples": [
-        "Team standup",
-        "Design review",
-        "Planning session",
-        "Real-time discussion"
-      ]
+        "Async design discussion (Slack, docs)",
+        "Email collaboration",
+        "Async feedback/review"
+      ],
+      "note": "Replace synchronous meetings with async alternatives when possible"
     },
     "interrupt_driven": {
       "route_to": "BATCH to phone windows OR DECLINE",
@@ -281,30 +397,38 @@
   },
   "non_negotiables": [
     "6-10am must be protected: airplane mode, phone away, no notifications",
+    "NO MORE THAN 1 MEETING/BILATERAL PER DAY (2-3 per week maximum)",
+    "MANDATORY 2-4 hour recovery block IMMEDIATELY after any meeting",
+    "During recovery: offline, no work, no decisions, light activities only",
     "No deep work after 3pm: respect your overstimulation boundary",
-    "Meeting density cap: max 2 hours consecutive before 30-60 min recovery",
     "Context switch limit: max 2-3 per hour; stop accepting new tasks when exceeded",
     "Phone windows: scheduled times only; no checking outside windows",
+    "Meeting anxiety is non-negotiable constraint: design around it, not through it",
     "Weekly review: Friday reflection on constraint violations; adjust if needed"
   ],
   "monthly_review_checklist": [
+    "Meeting load: Did I stay at 1 per day, 2-3 per week? (If exceeded: impact on anxiety and focus?)",
+    "Recovery blocks: After each meeting, did I take 2-4 hour recovery? (If skipped: cost to next days?)",
+    "Anxiety: On meeting days, could I focus on anything? (If no: normal, not a failure)",
     "Did I protect 6-10am every day? (If no, why?)",
     "Did context switches exceed 3/hour? (When? Pattern?)",
     "Did I work past 3pm? (How often? Cost?)",
     "Did I hit the phone window schedule? (Slips?)",
-    "How many meetings did I batch into 1-3pm? (Effective?)",
     "Energy level: confirm peak at 6-10am, decline by 3pm?",
-    "Violations: What got in the way? Remove obstacles?"
+    "Meeting anxiety: Getting better, worse, or stable? (Trend?)",
+    "Violations: What got in the way? Remove obstacles? Renegotiate meeting expectations?"
   ],
   "quarterly_rebase_questions": [
+    "Meeting anxiety: Has it improved, worsened, or stayed the same? (Is the 2-3 per week limit still necessary?)",
+    "Recovery requirement: Still need 2-4 hours after meetings? (More/less?)",
+    "Can you now focus on other things during meeting anxiety? (Or still completely blocked?)",
     "Is 6-10am still your peak focus window? (Or has it shifted?)",
     "Is 3pm still your overstimulation point? (Or later/earlier?)",
-    "Do you have the same attention issues? (Improved?)",
+    "Do you have the same attention issues? (Improved by better meeting management?)",
     "Phone usage: still a problem at 3pm+? (Better?)",
     "Context switching: still costly? (Threshold changed?)",
-    "Meeting tolerance: still 2 hours max? (More/less sustainable?)",
-    "Recovery ratio: still 2:1? (Changed?)"
+    "Recovery ratio: still 3:1? (Changed?)"
   ],
-  "notes": "Peak focus 6-10am (native fit for deep work). Sequential attention means context switches are expensive (10-15 min recovery each). Afternoon decline with overstimulation by 3-4pm. Phone usage is symptom of focus breakdown, not primary problem. Solution: protect peak window, batch interrupts into scheduled windows, hard stop by 3pm, give yourself permission to not work past that point. Problem is not willpower; it's architecture mismatch. Redesign the day to fit your OS.",
+  "notes": "CRITICAL CONSTRAINT: Meeting anxiety (bilateral/group) prevents focus on anything else until meeting ends. This is the dominant constraint on your workday, not just energy. Strategy: minimize meetings (1 per day max, 2-3 per week). Every meeting requires 2-4 hour recovery block. Design meeting days differently from no-meeting days. Peak focus 6-10am (native fit for deep work). Sequential attention means context switches are expensive. Afternoon decline by 3-4pm. Solution: protect peak window, limit meetings to 1-2 per week, give mandatory recovery after meetings, hard stop by 3pm. Problem is not willpower; it's architecture (sequential OS + high meeting anxiety + low social bandwidth). Redesign workload around this reality.",
   "version": "1.0"
 }
