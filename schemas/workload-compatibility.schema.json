@@ -1,0 +1,364 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workload Compatibility Matrix",
+  "description": "Maps workload types to OS requirements and costs",
+  "type": "object",
+  "required": [
+    "workload",
+    "required_os",
+    "mismatch_cost"
+  ],
+  "properties": {
+    "workload": {
+      "type": "string",
+      "enum": [
+        "deep_work",
+        "collaborative_work",
+        "creative_exploration",
+        "routine_execution",
+        "interrupt_driven",
+        "meta_work"
+      ],
+      "description": "Type of cognitive work"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable definition of this workload"
+    },
+    "required_os": {
+      "type": "object",
+      "description": "OS characteristics required for native-mode execution",
+      "properties": {
+        "attention_model": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "sequential",
+              "parallel",
+              "reactive"
+            ]
+          },
+          "description": "Compatible attention models (empty = any)"
+        },
+        "processing_mode": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "internal",
+              "external",
+              "hybrid"
+            ]
+          },
+          "description": "Compatible processing modes (empty = any)"
+        },
+        "decision_style": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "real_time",
+              "batch",
+              "deliberative"
+            ]
+          },
+          "description": "Compatible decision styles (empty = any)"
+        },
+        "energy_profile": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "steady",
+              "burst",
+              "volatile"
+            ]
+          },
+          "description": "Compatible energy profiles (empty = any)"
+        },
+        "structure_tolerance": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "description": "Compatible structure tolerances (empty = any)"
+        },
+        "social_bandwidth": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "description": "Compatible social bandwidths (empty = any)"
+        }
+      }
+    },
+    "mismatch_cost": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "Default cognitive cost when OS doesn't match native requirements"
+    },
+    "cost_breakdown": {
+      "type": "object",
+      "description": "Detailed cost structure when OS-workload fit is poor",
+      "properties": {
+        "compute_minutes_per_hour": {
+          "type": "integer",
+          "description": "Cognitive compute minutes required per hour of this workload (0-120)",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "context_switch_frequency": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "How much context switching this workload induces"
+        },
+        "recovery_ratio": {
+          "type": "number",
+          "description": "Recovery time required per hour of work (e.g., 1.0 = 1 hour recovery per hour worked)",
+          "minimum": 0.0,
+          "maximum": 4.0
+        },
+        "thermal_stress": {
+          "type": "integer",
+          "description": "Peak subjective stress level during execution (1-10)",
+          "minimum": 1,
+          "maximum": 10
+        }
+      }
+    },
+    "sustainability": {
+      "type": "object",
+      "description": "How long this workload can be sustained at different OS-fit levels",
+      "properties": {
+        "native": {
+          "type": "string",
+          "enum": [
+            "indefinite",
+            "8_hours",
+            "6_hours"
+          ]
+        },
+        "adapted": {
+          "type": "string",
+          "enum": [
+            "8_hours",
+            "6_hours",
+            "4_hours",
+            "2_hours"
+          ]
+        },
+        "emulated": {
+          "type": "string",
+          "enum": [
+            "4_hours",
+            "2_hours",
+            "1_hour"
+          ]
+        }
+      }
+    },
+    "ai_augmentation_suggested": {
+      "type": "boolean",
+      "description": "Whether AI augmentation is recommended when OS-fit is poor"
+    },
+    "ai_augmentation_strategies": {
+      "type": "array",
+      "description": "How AI can help bridge OS-workload gaps",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gap": {
+            "type": "string",
+            "description": "OS dimension where there's a mismatch"
+          },
+          "strategy": {
+            "type": "string",
+            "description": "How AI can fill the gap"
+          }
+        }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "description": "Real-world examples of this workload",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "examples": [
+    {
+      "workload": "deep_work",
+      "description": "Sustained, complex problem-solving requiring focus and internal processing",
+      "required_os": {
+        "attention_model": [
+          "sequential"
+        ],
+        "processing_mode": [
+          "internal"
+        ],
+        "decision_style": [
+          "batch",
+          "deliberative"
+        ],
+        "structure_tolerance": [
+          "medium",
+          "high"
+        ],
+        "social_bandwidth": []
+      },
+      "mismatch_cost": "high",
+      "cost_breakdown": {
+        "compute_minutes_per_hour": 60,
+        "context_switch_frequency": "low",
+        "recovery_ratio": 0.2,
+        "thermal_stress": 6
+      },
+      "sustainability": {
+        "native": "indefinite",
+        "adapted": "6_hours",
+        "emulated": "2_hours"
+      },
+      "ai_augmentation_suggested": false,
+      "ai_augmentation_strategies": [
+        {
+          "gap": "parallel_attention",
+          "strategy": "AI handles background research and synthesis while you focus on core problem"
+        },
+        {
+          "gap": "external_processing",
+          "strategy": "AI externalizes your thinking via writing, summaries, or structured notes"
+        }
+      ],
+      "examples": [
+        "Writing a research paper",
+        "Architecting a system design",
+        "Debugging a complex algorithm",
+        "Writing code for a critical subsystem"
+      ]
+    },
+    {
+      "workload": "collaborative_work",
+      "description": "Real-time team interaction, meetings, synchronous decision-making",
+      "required_os": {
+        "attention_model": [
+          "parallel",
+          "reactive"
+        ],
+        "processing_mode": [
+          "external",
+          "hybrid"
+        ],
+        "decision_style": [
+          "real_time",
+          "batch"
+        ],
+        "social_bandwidth": [
+          "medium",
+          "high"
+        ]
+      },
+      "mismatch_cost": "medium",
+      "cost_breakdown": {
+        "compute_minutes_per_hour": 80,
+        "context_switch_frequency": "high",
+        "recovery_ratio": 1.0,
+        "thermal_stress": 7
+      },
+      "sustainability": {
+        "native": "8_hours",
+        "adapted": "4_hours",
+        "emulated": "2_hours"
+      },
+      "ai_augmentation_suggested": true,
+      "ai_augmentation_strategies": [
+        {
+          "gap": "low_social_bandwidth",
+          "strategy": "AI attends meeting, summarizes decisions, extracts action items"
+        },
+        {
+          "gap": "sequential_attention",
+          "strategy": "AI manages background context; you focus on current discussion"
+        },
+        {
+          "gap": "internal_processing",
+          "strategy": "AI externalizes conversation; you reflect asynchronously"
+        }
+      ],
+      "examples": [
+        "Team standup meeting",
+        "Cross-functional planning session",
+        "Live design review",
+        "Sprint planning ceremony"
+      ]
+    },
+    {
+      "workload": "interrupt_driven",
+      "description": "Ad-hoc requests, live support, reactive firefighting, context switching",
+      "required_os": {
+        "attention_model": [
+          "reactive",
+          "parallel"
+        ],
+        "processing_mode": [],
+        "decision_style": [
+          "real_time"
+        ],
+        "energy_profile": [
+          "burst",
+          "volatile"
+        ],
+        "social_bandwidth": [
+          "medium",
+          "high"
+        ]
+      },
+      "mismatch_cost": "high",
+      "cost_breakdown": {
+        "compute_minutes_per_hour": 120,
+        "context_switch_frequency": "high",
+        "recovery_ratio": 2.0,
+        "thermal_stress": 8
+      },
+      "sustainability": {
+        "native": "8_hours",
+        "adapted": "4_hours",
+        "emulated": "1_hour"
+      },
+      "ai_augmentation_suggested": true,
+      "ai_augmentation_strategies": [
+        {
+          "gap": "sequential_attention",
+          "strategy": "AI triages and batches interrupts; reduces context switches"
+        },
+        {
+          "gap": "low_energy_burst",
+          "strategy": "AI responds to routine interrupts; you focus on complex ones"
+        },
+        {
+          "gap": "real_time_decision",
+          "strategy": "AI suggests responses; you approve or refine"
+        }
+      ],
+      "examples": [
+        "Customer support escalations",
+        "On-call infrastructure duties",
+        "Slack-driven incident response",
+        "Real-time debugging assistance"
+      ]
+    }
+  ]
+}

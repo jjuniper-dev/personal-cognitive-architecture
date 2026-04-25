@@ -1,0 +1,433 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cognitive Cost Model",
+  "description": "Economic model for cognitive workload accounting and budget management",
+  "type": "object",
+  "required": [
+    "mode",
+    "os_fit",
+    "costs"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "description": "Type of work being costed"
+    },
+    "os_fit": {
+      "type": "string",
+      "enum": [
+        "native",
+        "adapted",
+        "emulated"
+      ],
+      "description": "How well the workload matches the Personal OS"
+    },
+    "costs": {
+      "type": "object",
+      "description": "Economic breakdown of this workload",
+      "required": [
+        "compute"
+      ],
+      "properties": {
+        "compute": {
+          "type": "object",
+          "description": "Cognitive processing effort",
+          "required": [
+            "level"
+          ],
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "very_high"
+              ]
+            },
+            "compute_minutes_per_hour": {
+              "type": "number",
+              "description": "Cognitive compute units consumed per hour (0-120)",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "peak_intensity": {
+              "type": "integer",
+              "description": "Peak cognitive demand (1-10 scale)",
+              "minimum": 1,
+              "maximum": 10
+            }
+          }
+        },
+        "context": {
+          "type": "object",
+          "description": "Context switching overhead",
+          "properties": {
+            "switches_per_hour": {
+              "type": "integer",
+              "description": "Average context switches induced by this work",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "switch_cost_minutes": {
+              "type": "number",
+              "description": "Cognitive overhead per context switch (minutes)",
+              "minimum": 0.5,
+              "maximum": 15
+            }
+          }
+        },
+        "recovery": {
+          "type": "object",
+          "description": "Recovery time required",
+          "properties": {
+            "ratio": {
+              "type": "number",
+              "description": "Hours of recovery per hour of work",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "none",
+                "passive_rest",
+                "active_recovery",
+                "scheduled_break"
+              ],
+              "description": "What kind of recovery works best"
+            }
+          }
+        },
+        "thermal": {
+          "type": "object",
+          "description": "Stress and overload signals",
+          "properties": {
+            "peak_stress": {
+              "type": "integer",
+              "description": "Peak subjective stress level (1-10)",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "sustained_stress_threshold": {
+              "type": "integer",
+              "description": "Hours before sustained stress becomes unsustainable",
+              "minimum": 1,
+              "maximum": 8
+            }
+          }
+        }
+      }
+    },
+    "sustainability": {
+      "type": "object",
+      "description": "How long this workload can be sustained",
+      "required": [
+        "classification"
+      ],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": [
+            "sustainable_indefinite",
+            "sustainable_full_day",
+            "sustainable_half_day",
+            "unsustainable_without_breaks"
+          ]
+        },
+        "max_consecutive_hours": {
+          "type": "integer",
+          "description": "Maximum consecutive hours before mandatory break",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "daily_max_hours": {
+          "type": "integer",
+          "description": "Maximum hours per day (across multiple sessions)",
+          "minimum": 1,
+          "maximum": 8
+        }
+      }
+    },
+    "budget_impact": {
+      "type": "object",
+      "description": "How this workload impacts daily cognitive budget",
+      "properties": {
+        "base_budget_consumption": {
+          "type": "number",
+          "description": "Percentage of daily budget consumed per hour of work",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "marginal_cost_per_hour": {
+          "type": "number",
+          "description": "Increasing cost as cumulative fatigue builds (multiplier)",
+          "minimum": 1,
+          "maximum": 3
+        }
+      }
+    },
+    "mitigation_strategies": {
+      "type": "array",
+      "description": "Ways to reduce cognitive cost of this workload",
+      "items": {
+        "type": "object",
+        "properties": {
+          "strategy": {
+            "type": "string"
+          },
+          "cost_reduction": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "effort": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    },
+    "ai_augmentation_potential": {
+      "type": "object",
+      "description": "How AI can reduce cognitive cost",
+      "properties": {
+        "recommended": {
+          "type": "boolean"
+        },
+        "potential_cost_reduction": {
+          "type": "integer",
+          "description": "Percentage cost reduction if AI augmentation applied",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "specific_strategies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ai_role": {
+                "type": "string"
+              },
+              "cost_impact": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "warning_signs": {
+      "type": "array",
+      "description": "Signals that cognitive cost is too high and adjustment needed",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "examples": [
+    {
+      "mode": "deep_work_in_sequential_os",
+      "os_fit": "native",
+      "costs": {
+        "compute": {
+          "level": "medium",
+          "compute_minutes_per_hour": 60,
+          "peak_intensity": 7
+        },
+        "context": {
+          "switches_per_hour": 1,
+          "switch_cost_minutes": 2
+        },
+        "recovery": {
+          "ratio": 0.2,
+          "type": "passive_rest"
+        },
+        "thermal": {
+          "peak_stress": 5,
+          "sustained_stress_threshold": 8
+        }
+      },
+      "sustainability": {
+        "classification": "sustainable_full_day",
+        "max_consecutive_hours": 6,
+        "daily_max_hours": 8
+      },
+      "budget_impact": {
+        "base_budget_consumption": 12.5,
+        "marginal_cost_per_hour": 1.05
+      },
+      "mitigation_strategies": [
+        {
+          "strategy": "Pomodoro technique (25 min focus, 5 min break)",
+          "cost_reduction": "low",
+          "effort": "low"
+        },
+        {
+          "strategy": "Batch similar tasks to reduce context switching",
+          "cost_reduction": "medium",
+          "effort": "medium"
+        }
+      ],
+      "ai_augmentation_potential": {
+        "recommended": false,
+        "potential_cost_reduction": 10,
+        "specific_strategies": []
+      },
+      "warning_signs": [
+        "Multiple context switches per hour",
+        "Difficulty maintaining focus",
+        "Decision fatigue after 3-4 hours"
+      ]
+    },
+    {
+      "mode": "interrupt_driven_in_sequential_os",
+      "os_fit": "emulated",
+      "costs": {
+        "compute": {
+          "level": "very_high",
+          "compute_minutes_per_hour": 120,
+          "peak_intensity": 9
+        },
+        "context": {
+          "switches_per_hour": 8,
+          "switch_cost_minutes": 5
+        },
+        "recovery": {
+          "ratio": 2.0,
+          "type": "active_recovery"
+        },
+        "thermal": {
+          "peak_stress": 8,
+          "sustained_stress_threshold": 2
+        }
+      },
+      "sustainability": {
+        "classification": "unsustainable_without_breaks",
+        "max_consecutive_hours": 1,
+        "daily_max_hours": 3
+      },
+      "budget_impact": {
+        "base_budget_consumption": 100,
+        "marginal_cost_per_hour": 1.5
+      },
+      "mitigation_strategies": [
+        {
+          "strategy": "Designate interrupt windows (e.g., 10-11am, 3-4pm)",
+          "cost_reduction": "high",
+          "effort": "medium"
+        },
+        {
+          "strategy": "Batch interrupts; require summary before context switch",
+          "cost_reduction": "high",
+          "effort": "medium"
+        },
+        {
+          "strategy": "Delegate interrupt-handling to another person",
+          "cost_reduction": "high",
+          "effort": "high"
+        }
+      ],
+      "ai_augmentation_potential": {
+        "recommended": true,
+        "potential_cost_reduction": 40,
+        "specific_strategies": [
+          {
+            "ai_role": "Triage interrupts; categorize by urgency and domain",
+            "cost_impact": "Reduces context switching by 50%"
+          },
+          {
+            "ai_role": "Draft responses to routine interrupts; you review/approve",
+            "cost_impact": "Reduces decision latency"
+          },
+          {
+            "ai_role": "Synthesize interrupt patterns; suggest process improvements",
+            "cost_impact": "Long-term cost reduction"
+          }
+        ]
+      },
+      "warning_signs": [
+        "More than 5 context switches per hour",
+        "Stress level >7/10 for >1 hour",
+        "Inability to complete planned work",
+        "Decision paralysis or irritability"
+      ]
+    },
+    {
+      "mode": "collaborative_work_in_low_bandwidth_os",
+      "os_fit": "adapted",
+      "costs": {
+        "compute": {
+          "level": "high",
+          "compute_minutes_per_hour": 80,
+          "peak_intensity": 7
+        },
+        "context": {
+          "switches_per_hour": 4,
+          "switch_cost_minutes": 3
+        },
+        "recovery": {
+          "ratio": 1.0,
+          "type": "scheduled_break"
+        },
+        "thermal": {
+          "peak_stress": 7,
+          "sustained_stress_threshold": 3
+        }
+      },
+      "sustainability": {
+        "classification": "sustainable_half_day",
+        "max_consecutive_hours": 3,
+        "daily_max_hours": 4
+      },
+      "budget_impact": {
+        "base_budget_consumption": 16.7,
+        "marginal_cost_per_hour": 1.3
+      },
+      "mitigation_strategies": [
+        {
+          "strategy": "Batch meetings into 2-hour blocks with recovery after",
+          "cost_reduction": "high",
+          "effort": "medium"
+        },
+        {
+          "strategy": "Reduce participant count; smaller groups demand less social energy",
+          "cost_reduction": "medium",
+          "effort": "medium"
+        },
+        {
+          "strategy": "Asynchronous alternatives (written summaries, Slack discussions)",
+          "cost_reduction": "high",
+          "effort": "low"
+        }
+      ],
+      "ai_augmentation_potential": {
+        "recommended": true,
+        "potential_cost_reduction": 30,
+        "specific_strategies": [
+          {
+            "ai_role": "Attend meeting; you review summary and decisions asynchronously",
+            "cost_impact": "Eliminates real-time social cost; replaces with async review"
+          },
+          {
+            "ai_role": "Pre-meeting prep; AI briefs you on context and stakeholder positions",
+            "cost_impact": "Reduces cognitive load during meeting"
+          }
+        ]
+      },
+      "warning_signs": [
+        ">3 hours consecutive meetings",
+        "Fatigue before end of meeting",
+        "Difficulty tracking conversation",
+        "Irritability or emotional withdrawal"
+      ]
+    }
+  ]
+}
