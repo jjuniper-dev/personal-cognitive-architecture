@@ -1,0 +1,316 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Validation Result Contract",
+  "description": "Machine-readable validation output from scoring and classification",
+  "type": "object",
+  "required": [
+    "validation_id",
+    "capture_id",
+    "validation_timestamp",
+    "overall_score",
+    "routing_action"
+  ],
+  "properties": {
+    "validation_id": {
+      "type": "string",
+      "description": "UUID for this validation run",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "capture_id": {
+      "type": "string",
+      "description": "Reference to original capture"
+    },
+    "validation_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When validation occurred"
+    },
+    "scoring": {
+      "type": "object",
+      "description": "Four-dimensional scoring results",
+      "required": ["credibility", "relevance", "novelty", "signal_strength", "overall_score"],
+      "properties": {
+        "credibility": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Source reliability score"
+        },
+        "relevance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Project/domain alignment score"
+        },
+        "novelty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Uniqueness score"
+        },
+        "signal_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Actionability/decision-criticality score"
+        },
+        "overall_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Weighted average: (credibility×0.20 + relevance×0.40 + novelty×0.30 + signal_strength×0.10)"
+        },
+        "score_factors": {
+          "type": "array",
+          "description": "Detailed breakdown of scoring factors",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dimension": {
+                "type": "string",
+                "enum": ["credibility", "relevance", "novelty", "signal_strength"]
+              },
+              "factors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "string",
+                      "description": "Factor name"
+                    },
+                    "contribution": {
+                      "type": "number",
+                      "description": "Contribution to dimension score"
+                    },
+                    "reasoning": {
+                      "type": "string",
+                      "description": "Why this factor applied"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "description": "Content classification results",
+      "required": ["note_type", "domain", "confidence"],
+      "properties": {
+        "note_type": {
+          "type": "string",
+          "enum": [
+            "task",
+            "meeting",
+            "idea",
+            "reference",
+            "decision",
+            "project-note",
+            "strategy-note",
+            "research",
+            "workflow-trigger",
+            "unknown"
+          ]
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "strategic-planning",
+            "product-delivery",
+            "research",
+            "operations",
+            "governance",
+            "external-engagement",
+            "personal",
+            "unknown"
+          ]
+        },
+        "project": {
+          "type": ["string", "null"],
+          "description": "Inferred project name"
+        },
+        "intent": {
+          "type": "string",
+          "enum": ["inform", "request", "decide", "action", "explore", "record"]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence in this classification"
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "Why this classification was assigned"
+        },
+        "alternative_classifications": {
+          "type": "array",
+          "description": "Other possible classifications with lower confidence",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "description": "Comparison against existing knowledge graph",
+      "properties": {
+        "similar_notes": {
+          "type": "array",
+          "description": "Related items in vault",
+          "items": {
+            "type": "object",
+            "properties": {
+              "note_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "similarity_score": {
+                "type": "number"
+              },
+              "relationship": {
+                "type": "string",
+                "enum": ["same-topic", "related-topic", "contradicts", "supersedes", "extends"]
+              }
+            }
+          }
+        },
+        "contradictions_detected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "existing_node_id": {
+                "type": "string"
+              },
+              "existing_statement": {
+                "type": "string"
+              },
+              "candidate_statement": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              }
+            }
+          }
+        },
+        "reconciliation_status": {
+          "type": "string",
+          "enum": ["clear", "requires-review", "contradicts-high-confidence", "defer-to-review"]
+        }
+      }
+    },
+    "routing_action": {
+      "type": "string",
+      "enum": [
+        "ADVANCE_TO_INTEGRATION",
+        "ROUTE_WITH_TAG",
+        "ESCALATE_FOR_REVIEW",
+        "TRIGGER_WORKFLOW",
+        "QUEUE_FOR_REVIEW",
+        "QUARANTINE"
+      ],
+      "description": "Routing decision based on all above factors"
+    },
+    "routing_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence in this routing decision"
+    },
+    "destination": {
+      "type": ["string", "null"],
+      "description": "Target Obsidian folder path"
+    },
+    "tags_to_apply": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags to add to note"
+    },
+    "requires_review": {
+      "type": "boolean",
+      "description": "Whether human review is required"
+    },
+    "review_priority": {
+      "type": ["string", "null"],
+      "enum": ["low", "medium", "high", null],
+      "description": "Priority level if review required"
+    },
+    "validation_metadata": {
+      "type": "object",
+      "description": "Process metadata",
+      "properties": {
+        "models_used": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string"
+              },
+              "latency_ms": {
+                "type": "integer"
+              },
+              "cost_usd": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "processing_time_ms": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "validation_id": "770g0601-g51d-62f6-c938-558877662222",
+      "capture_id": "550e8400-e29b-41d4-a716-446655440000",
+      "validation_timestamp": "2026-04-25T14:30:25Z",
+      "scoring": {
+        "credibility": 0.85,
+        "relevance": 0.85,
+        "novelty": 0.68,
+        "signal_strength": 0.80,
+        "overall_score": 0.794
+      },
+      "classification": {
+        "note_type": "task",
+        "domain": "strategic-planning",
+        "project": "PATH-HAIL",
+        "intent": "action",
+        "confidence": 0.92,
+        "reasoning": "Contains explicit action verb, deadline, and person assignment"
+      },
+      "reconciliation": {
+        "similar_notes": [],
+        "contradictions_detected": [],
+        "reconciliation_status": "clear"
+      },
+      "routing_action": "ADVANCE_TO_INTEGRATION",
+      "routing_confidence": 0.91,
+      "destination": "/10-Projects/PATH-HAIL/Tasks",
+      "tags_to_apply": ["task", "strategic-planning", "PATH-HAIL"],
+      "requires_review": false
+    }
+  ]
+}
