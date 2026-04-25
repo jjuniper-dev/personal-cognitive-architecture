@@ -1,0 +1,310 @@
+{
+  "name": "You",
+  "date_profiled": "2025-04-25",
+  "personal_os": {
+    "attention_model": "sequential",
+    "processing_mode": "internal",
+    "decision_style": "batch",
+    "energy_profile": "burst",
+    "structure_tolerance": "low",
+    "social_bandwidth": "medium"
+  },
+  "firmware_notes": {
+    "baseline_energy_level": "high",
+    "peak_focus_window": "6-10am",
+    "peak_focus_duration_hours": 4,
+    "overstimulation_point": "3-4pm",
+    "sensory_sensitivity": "high",
+    "introversion_extroversion": "introverted"
+  },
+  "native_workloads": [
+    "deep_work"
+  ],
+  "adapted_workloads": [
+    "routine_execution",
+    "meta_work",
+    "collaborative_work_in_batches"
+  ],
+  "emulated_workloads": [
+    "interrupt_driven",
+    "prolonged_meetings",
+    "creative_exploration_under_time_pressure"
+  ],
+  "daily_compute_budget": 240,
+  "peak_focus_window": "6-10am",
+  "peak_focus_hours": 4,
+  "afternoon_decline_starts": "10am",
+  "overstimulation_boundary": "3pm",
+  "context_switch_tolerance": 2,
+  "meeting_density_tolerance": 2,
+  "recovery_time_ratio": 2.0,
+  "phone_windows": [
+    {
+      "start": "10:15am",
+      "duration_minutes": 15,
+      "purpose": "Check messages after morning deep work"
+    },
+    {
+      "start": "12:30pm",
+      "duration_minutes": 15,
+      "purpose": "Check messages during lunch"
+    },
+    {
+      "start": "2:30pm",
+      "duration_minutes": 15,
+      "purpose": "Final check before afternoon decline"
+    }
+  ],
+  "hygiene_rules": {
+    "protect_peak_focus": {
+      "time_block": "6am-10am",
+      "status": "non_negotiable",
+      "actions": [
+        "Block calendar as 'Deep Focus - Offline'",
+        "Airplane mode on phone",
+        "Phone in kitchen or inaccessible location",
+        "Slack/email/notifications: OFF",
+        "Calendar block recurring: every weekday"
+      ],
+      "violations": "Lose entire day's focus window; rest of day is lower quality"
+    },
+    "context_switch_cap": {
+      "threshold": ">2-3 per hour",
+      "action": "STOP accepting new tasks; finish current task",
+      "signal": "Noticing yourself jumping between things; losing focus",
+      "response": "Set timer; complete current task; no new tasks until timer ends"
+    },
+    "overstimulation_boundary": {
+      "threshold": "3pm",
+      "action": "No deep work after 3pm; light work or STOP",
+      "recovery": "1-2 hours low-stress activity (walk, read, async admin)",
+      "violation_cost": "Next day's focus degraded; requires 2x recovery"
+    },
+    "meeting_density_limit": {
+      "threshold": "2 consecutive hours of meetings",
+      "action": "Recovery break required after (30-60 min solo time)",
+      "blocking": "Decline 3+ meetings in a row; suggest async alternative"
+    },
+    "phone_discipline": {
+      "mechanism": "Scheduled windows only",
+      "windows": "10:15am, 12:30pm, 2:30pm (15 min each)",
+      "outside_windows": "Phone inaccessible (kitchen, drawer, airplane mode)",
+      "rationale": "Phone usage spikes as focus breaks down; batching prevents constant checking"
+    }
+  },
+  "daily_schedule_recommendation": "Option A: Protect Peak",
+  "daily_schedule": {
+    "6am-10am": {
+      "activity": "DEEP WORK BLOCK (your golden 4 hours)",
+      "workload_type": "deep_work",
+      "os_fit": "native",
+      "task_examples": [
+        "System architecture and design",
+        "Complex writing (proposals, documentation)",
+        "Algorithm development",
+        "Strategic planning"
+      ],
+      "rules": [
+        "Offline mode: notifications OFF",
+        "Single task only",
+        "Clear goal when starting",
+        "Block calendar",
+        "Let calls go to voicemail"
+      ],
+      "compute_cost": "240 minutes total (60 min/hour × 4 hours)"
+    },
+    "10am-12pm": {
+      "activity": "TRANSITION + ROUTINE",
+      "workload_type": "routine_execution + meta_work",
+      "os_fit": "adapted",
+      "task_examples": [
+        "Email triage (30 min)",
+        "Administrative tasks (30 min)",
+        "One meeting if necessary (60 min max)",
+        "Planning/brief collaborative work"
+      ],
+      "context_switches_allowed": "1-2 per hour OK",
+      "compute_cost": "160 minutes (80 min/hour × 2 hours)"
+    },
+    "12pm-1pm": {
+      "activity": "LUNCH + BREAK",
+      "workload_type": "recovery",
+      "os_fit": "none (intentional rest)",
+      "task_examples": [
+        "Eat (away from desk if possible)",
+        "Walk outside",
+        "No work"
+      ],
+      "compute_cost": "0 minutes (recovery time)"
+    },
+    "1pm-3pm": {
+      "activity": "COLLABORATIVE or ROUTINE WORK",
+      "workload_type": "collaborative_work + routine_execution",
+      "os_fit": "adapted",
+      "task_examples": [
+        "Team meetings (up to 2 hours total)",
+        "Async work (writing, reviewing documents)",
+        "Planning/meta-work",
+        "1-2 context switches OK"
+      ],
+      "context_switches_allowed": "2-3 per hour OK",
+      "compute_cost": "160 minutes (80 min/hour × 2 hours)"
+    },
+    "3pm-5pm": {
+      "activity": "LIGHT WORK or STOP (winding down)",
+      "workload_type": "routine_execution or recovery",
+      "os_fit": "adapted or rest",
+      "task_examples": [
+        "Email (async responses only)",
+        "Light organization",
+        "Simple tasks (no decisions)",
+        "Or: STOP and recover (walk, offline)"
+      ],
+      "depth_allowed": "Low; no deep thinking required",
+      "compute_cost": "0-80 minutes (if working: light work only)"
+    },
+    "5pm+": {
+      "activity": "OFF",
+      "workload_type": "personal_time",
+      "os_fit": "recovery",
+      "task_examples": [
+        "Personal activities",
+        "Family time",
+        "Hobbies",
+        "No work"
+      ],
+      "compute_cost": "0 minutes"
+    }
+  },
+  "workload_routing": {
+    "deep_work": {
+      "route_to": "6-10am window",
+      "fit": "native",
+      "time_needed": "2+ hour unbroken blocks",
+      "cost_per_hour": 60,
+      "examples": [
+        "System design",
+        "Complex problem-solving",
+        "Writing/documentation",
+        "Architecture decisions"
+      ]
+    },
+    "routine_execution": {
+      "route_to": "10am-12pm or 1pm-3pm",
+      "fit": "adapted",
+      "time_needed": "30min-1hr blocks",
+      "cost_per_hour": 80,
+      "examples": [
+        "Email triage",
+        "File organization",
+        "Calendar planning",
+        "Administrative tasks"
+      ]
+    },
+    "collaborative_work": {
+      "route_to": "1pm-3pm (batched)",
+      "fit": "adapted",
+      "time_needed": "60min blocks max",
+      "cost_per_hour": 80,
+      "examples": [
+        "Team standup",
+        "Design review",
+        "Planning session",
+        "Real-time discussion"
+      ]
+    },
+    "interrupt_driven": {
+      "route_to": "BATCH to phone windows OR DECLINE",
+      "fit": "emulated",
+      "time_needed": "15-30min windows",
+      "cost_per_hour": 120,
+      "max_per_day": "2 hours (if batched)",
+      "examples": [
+        "Ad-hoc Slack requests",
+        "Quick questions",
+        "Customer escalations",
+        "Production issues"
+      ]
+    }
+  },
+  "decision_tree": {
+    "task_classification": {
+      "is_deep_work": {
+        "yes": "Schedule for 6-10am window (native fit)",
+        "no": "proceed"
+      },
+      "is_routine_or_admin": {
+        "yes": "Schedule for 10am-12pm or 1pm-3pm (adapted fit)",
+        "no": "proceed"
+      },
+      "is_collaborative": {
+        "yes": "Batch into 1pm-3pm meetings (adapted fit)",
+        "no": "proceed"
+      },
+      "is_interrupt_driven": {
+        "yes": "Decline if possible; batch to phone windows if necessary (emulated fit)",
+        "no": "proceed"
+      },
+      "can_it_wait": {
+        "yes": "Defer to tomorrow or next week",
+        "no": "proceed"
+      },
+      "is_it_critical": {
+        "yes": "Do it; then block recovery time",
+        "no": "Defer or delegate"
+      }
+    }
+  },
+  "phone_usage_strategy": {
+    "6am-10am": {
+      "status": "HARD STOP",
+      "implementation": "Airplane mode + phone in kitchen",
+      "rationale": "Most valuable hours; protect absolutely"
+    },
+    "10am-12pm": {
+      "status": "SCHEDULED WINDOWS ONLY",
+      "windows": "10:15am (15 min)",
+      "implementation": "Phone in drawer; timer; back to drawer when timer rings",
+      "rationale": "Batch checking; prevent constant context switching"
+    },
+    "12pm-3pm": {
+      "status": "SCHEDULED WINDOWS ONLY",
+      "windows": "12:30pm (15 min), 2:30pm (15 min)",
+      "implementation": "Phone in drawer; timer; back to drawer when timer rings",
+      "rationale": "Afternoon decline; minimize interrupts; batch communication"
+    },
+    "3pm+": {
+      "status": "OFF (unless personal use only)",
+      "implementation": "Phone stored away; notifications OFF",
+      "rationale": "Already overstimulated; phone adds nothing but noise"
+    }
+  },
+  "non_negotiables": [
+    "6-10am must be protected: airplane mode, phone away, no notifications",
+    "No deep work after 3pm: respect your overstimulation boundary",
+    "Meeting density cap: max 2 hours consecutive before 30-60 min recovery",
+    "Context switch limit: max 2-3 per hour; stop accepting new tasks when exceeded",
+    "Phone windows: scheduled times only; no checking outside windows",
+    "Weekly review: Friday reflection on constraint violations; adjust if needed"
+  ],
+  "monthly_review_checklist": [
+    "Did I protect 6-10am every day? (If no, why?)",
+    "Did context switches exceed 3/hour? (When? Pattern?)",
+    "Did I work past 3pm? (How often? Cost?)",
+    "Did I hit the phone window schedule? (Slips?)",
+    "How many meetings did I batch into 1-3pm? (Effective?)",
+    "Energy level: confirm peak at 6-10am, decline by 3pm?",
+    "Violations: What got in the way? Remove obstacles?"
+  ],
+  "quarterly_rebase_questions": [
+    "Is 6-10am still your peak focus window? (Or has it shifted?)",
+    "Is 3pm still your overstimulation point? (Or later/earlier?)",
+    "Do you have the same attention issues? (Improved?)",
+    "Phone usage: still a problem at 3pm+? (Better?)",
+    "Context switching: still costly? (Threshold changed?)",
+    "Meeting tolerance: still 2 hours max? (More/less sustainable?)",
+    "Recovery ratio: still 2:1? (Changed?)"
+  ],
+  "notes": "Peak focus 6-10am (native fit for deep work). Sequential attention means context switches are expensive (10-15 min recovery each). Afternoon decline with overstimulation by 3-4pm. Phone usage is symptom of focus breakdown, not primary problem. Solution: protect peak window, batch interrupts into scheduled windows, hard stop by 3pm, give yourself permission to not work past that point. Problem is not willpower; it's architecture mismatch. Redesign the day to fit your OS.",
+  "version": "1.0"
+}
