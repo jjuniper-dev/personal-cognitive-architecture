@@ -51,13 +51,18 @@ PCA should feel like cognitive infrastructure, not a chatbot shell.
 PCA is intended to:
 
 - ingest from voice, web, files, chat, video, and manual notes
-- score and route incoming information
+- score and route incoming information through validation layer
 - keep low-confidence material out of trusted memory
-- maintain canonical knowledge in Obsidian
+- maintain canonical knowledge in Obsidian (human-readable, durable)
+- actively reconcile new information against existing knowledge through the Cognitive Reconciliation Engine
+- detect reinforcement, contradictions, gaps, and novel contributions
+- update confidence levels and trigger belief evolution
 - support semantic retrieval through indexing layers without replacing canonical memory
-- orchestrate agents across personal and professional domains
-- produce useful outputs from structured knowledge
+- orchestrate agents across personal and professional domains with governed scope
+- produce high-quality artifacts meeting GC/HC standards where applicable
 - support human-in-the-loop governance for consequential reasoning and actions
+- generate structured outputs (presentations, documents, dashboards, audio) from integrated knowledge
+- maintain compliance with Responsible AI principles and ethical frameworks
 
 ## Architectural posture
 
