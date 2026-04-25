@@ -1,0 +1,325 @@
+{
+  "name": "PCA Ingest Loop (Unified Router)",
+  "description": "Main orchestration: Receive → Classify → Validate → Route → Store",
+  "flow": "One unified router for all three ingestion patterns",
+  "status": "Stub - Ready for Implementation",
+  "version": "1.0",
+  "created": "2026-04-25",
+  "nodes": [
+    {
+      "node_id": "Node_Webhook",
+      "node_type": "Webhook",
+      "name": "Capture Input (All Sources)",
+      "description": "Receive inbound captures from iPhone, web, email, RSS",
+      "configuration": {
+        "webhook_path": "/webhook/pca-ingest",
+        "webhook_method": "POST",
+        "authentication": "basic",
+        "expected_content_types": [
+          "multipart/form-data",
+          "application/json"
+        ]
+      },
+      "input_schema": "schemas/ingest-capture.schema.json",
+      "output": {
+        "capture_id": "{{uuid()}}",
+        "source_type": "{{$json.source_type}}",
+        "content": "{{$json.content}}",
+        "metadata": "{{$json.metadata}}"
+      },
+      "notes": "Entry point for all ingestion patterns"
+    },
+    {
+      "node_id": "Node_ClassifySourceType",
+      "node_type": "IF",
+      "name": "Classify Source Type",
+      "description": "Route to appropriate processing path",
+      "conditions": [
+        {
+          "condition": "source_type == 'voice' OR 'text' OR 'email'",
+          "branch": "Pattern_UnstructuredIdeas",
+          "description": "Light structuring, low confidence initial"
+        },
+        {
+          "condition": "source_type == 'article' OR 'pdf' OR 'web' OR 'document'",
+          "branch": "Pattern_StructuredKnowledge",
+          "description": "Deep processing, validation required"
+        },
+        {
+          "condition": "source_type == 'rss' OR 'api'",
+          "branch": "Pattern_DynamicSignals",
+          "description": "Shallow filtering, automated scoring"
+        },
+        {
+          "condition": "else",
+          "branch": "Node_Quarantine",
+          "description": "Unknown source type"
+        }
+      ]
+    },
+    {
+      "node_id": "Pattern_UnstructuredIdeas",
+      "node_type": "GROUP",
+      "name": "Unstructured Ideas Path",
+      "description": "Voice, quick text, light structuring",
+      "steps": [
+        {
+          "step": 1,
+          "name": "Transcribe (if voice)",
+          "node_type": "HTTP",
+          "config": "Call Whisper API OR local model",
+          "output": "raw_text"
+        },
+        {
+          "step": 2,
+          "name": "Extract Entities",
+          "node_type": "Function",
+          "config": "People, projects, deadlines, urgency markers",
+          "output": "extracted_entities"
+        },
+        {
+          "step": 3,
+          "name": "Light Classification",
+          "node_type": "Function",
+          "config": "Simple heuristics (NOT LLM)",
+          "output": "preliminary_type, preliminary_confidence (0.4-0.7)"
+        },
+        {
+          "step": 4,
+          "name": "Route to Inbox",
+          "node_type": "Template + Write",
+          "config": "Use templates/inbox-capture.md",
+          "output": "note in 00-Inbox"
+        }
+      ]
+    },
+    {
+      "node_id": "Pattern_StructuredKnowledge",
+      "node_type": "GROUP",
+      "name": "Structured Knowledge Path",
+      "description": "Articles, PDFs, web content, deep validation",
+      "steps": [
+        {
+          "step": 1,
+          "name": "Extract & Normalize",
+          "node_type": "Function",
+          "config": "OCR if PDF, format standardization",
+          "output": "clean_text, word_count, extracted_metadata"
+        },
+        {
+          "step": 2,
+          "name": "Chunk & Embed",
+          "node_type": "Function + HTTP",
+          "config": "Split into propositions, generate embeddings",
+          "output": "chunks with embeddings"
+        },
+        {
+          "step": 3,
+          "name": "Score (4D Model)",
+          "node_type": "Function (4 separate scorers)",
+          "config": "credibility, relevance, novelty, signal_strength",
+          "output": "overall_score (0.0-1.0)"
+        },
+        {
+          "step": 4,
+          "name": "Classify (LLM)",
+          "node_type": "OpenAI",
+          "config": "Domain, project, type, intent",
+          "output": "classification fields"
+        },
+        {
+          "step": 5,
+          "name": "Reconcile",
+          "node_type": "Function + File",
+          "config": "Query vault, detect contradictions",
+          "output": "reconciliation_status"
+        },
+        {
+          "step": 6,
+          "name": "Apply Routing Rules",
+          "node_type": "Function",
+          "config": "Load data/routing-rules.json, evaluate conditions",
+          "output": "routing_action, destination"
+        },
+        {
+          "step": 7,
+          "name": "Write to Obsidian",
+          "node_type": "Template + File",
+          "config": "Use templates/structured-source-note.md",
+          "output": "note in destination folder"
+        }
+      ]
+    },
+    {
+      "node_id": "Pattern_DynamicSignals",
+      "node_type": "GROUP",
+      "name": "Dynamic Signals Path",
+      "description": "RSS, APIs, automated filtering",
+      "steps": [
+        {
+          "step": 1,
+          "name": "Normalize",
+          "node_type": "Function",
+          "config": "Title, URL, publication date, source",
+          "output": "normalized_signal"
+        },
+        {
+          "step": 2,
+          "name": "Deduplicate",
+          "node_type": "Function",
+          "config": "Check content hash + semantic similarity",
+          "output": "is_duplicate boolean"
+        },
+        {
+          "step": 3,
+          "name": "Score Signal",
+          "node_type": "Function (5D: relevance, urgency, novelty, credibility, actionability)",
+          "config": "Use data/signal-sources.json for feed credibility",
+          "output": "signal_score.schema.json"
+        },
+        {
+          "step": 4,
+          "name": "Classify (Low-touch)",
+          "node_type": "Function",
+          "config": "info vs. review vs. alert (no LLM)",
+          "output": "classification"
+        },
+        {
+          "step": 5,
+          "name": "Route & Alert",
+          "node_type": "Function + IF",
+          "config": "Load routing rules, apply thresholds",
+          "output": "destination, alert_channels (if any)"
+        },
+        {
+          "step": 6,
+          "name": "Write to Obsidian",
+          "node_type": "Template + File",
+          "config": "Use templates/signal-note.md",
+          "output": "note in destination"
+        },
+        {
+          "step": 7,
+          "name": "Send Alerts (optional)",
+          "node_type": "HTTP + Notification",
+          "config": "Push, email, Slack if CRITICAL",
+          "output": "notifications sent"
+        }
+      ]
+    },
+    {
+      "node_id": "Node_AuditLog",
+      "node_type": "Function + File",
+      "name": "Audit Trail",
+      "description": "Log all decisions for compliance and learning",
+      "configuration": {
+        "log_file": "audit-logs/audit-{{date}}.jsonl",
+        "fields_logged": [
+          "capture_id",
+          "source_type",
+          "routing_action",
+          "destination",
+          "confidence_scores",
+          "models_used",
+          "processing_time_ms",
+          "cost_usd",
+          "timestamp"
+        ]
+      },
+      "output": "audit entry appended to daily JSONL"
+    },
+    {
+      "node_id": "Node_Quarantine",
+      "node_type": "Function + File",
+      "name": "Quarantine (Low Signal or Error)",
+      "description": "Handle low-confidence or problematic captures",
+      "conditions": {
+        "low_confidence": "confidence < 0.30 OR confidence_score < 0.30",
+        "error": "Processing failed or source_type unknown"
+      },
+      "action": {
+        "destination": "00-Quarantine",
+        "retention_days": 7,
+        "tags": ["quarantine", "low-signal"]
+      }
+    },
+    {
+      "node_id": "Node_EventEmit",
+      "node_type": "Function",
+      "name": "Emit Downstream Events (Optional)",
+      "description": "Trigger optional downstream workflows",
+      "triggers": [
+        {
+          "trigger": "routing_action == 'TRIGGER_WORKFLOW'",
+          "action": "create_task_in_external_system"
+        },
+        {
+          "trigger": "requires_review == true",
+          "action": "add_to_review_queue"
+        },
+        {
+          "trigger": "classification == 'CRITICAL'",
+          "action": "notify_stakeholders"
+        }
+      ]
+    }
+  ],
+  "error_handling": {
+    "transcription_fails": {
+      "action": "Set transcription_confidence = 0.0, continue to next step",
+      "fallback": "Route to QUEUE_FOR_REVIEW instead of ADVANCE"
+    },
+    "api_timeout": {
+      "action": "Retry 3x with exponential backoff",
+      "fallback": "Use local model or hold for manual review"
+    },
+    "obsidian_write_fails": {
+      "action": "Retry 3x, then queue for manual write",
+      "alert": "Notify user that write failed"
+    }
+  },
+  "performance_targets": {
+    "unstructured_ideas": {
+      "latency_ms": 5000,
+      "cost_usd": 0.0,
+      "expected": "Fast, zero API calls"
+    },
+    "structured_knowledge": {
+      "latency_ms": 20000,
+      "cost_usd": 0.05,
+      "expected": "Deep processing, GPT-4 classification"
+    },
+    "dynamic_signals": {
+      "latency_ms": 3000,
+      "cost_usd": 0.0,
+      "expected": "Fast filtering, local scoring"
+    }
+  },
+  "deployment": {
+    "step_1": "Copy this stub into n8n UI",
+    "step_2": "Replace {{VARIABLE}} placeholders with actual settings",
+    "step_3": "Test with sample data from schemas/examples/",
+    "step_4": "Activate webhook and test with real capture",
+    "step_5": "Deploy to production, enable scheduling"
+  },
+  "related_files": {
+    "schemas": [
+      "schemas/ingest-capture.schema.json",
+      "schemas/validation-result.schema.json",
+      "schemas/signal-score.schema.json"
+    ],
+    "templates": [
+      "templates/inbox-capture.md",
+      "templates/structured-source-note.md",
+      "templates/signal-note.md"
+    ],
+    "data": [
+      "data/routing-rules.json",
+      "data/signal-sources.json"
+    ],
+    "docs": [
+      "docs/pca-iphone-to-obsidian-workflow.md",
+      "docs/pca-ingestion-patterns.md"
+    ]
+  }
+}

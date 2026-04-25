@@ -1,0 +1,128 @@
+{
+  "version": "1.0",
+  "description": "Registry of external signal sources (RSS feeds, APIs, monitoring)",
+  "created": "2026-04-25",
+  "last_updated": "2026-04-25",
+  "metadata": {
+    "total_sources": 0,
+    "active_sources": 0,
+    "last_check": null
+  },
+  "signal_sources": [
+    {
+      "id": "ai-governance-news",
+      "name": "AI Governance News",
+      "description": "News and updates on AI governance and regulation",
+      "type": "rss",
+      "url": "https://example.com/feeds/ai-governance.xml",
+      "enabled": true,
+      "poll_interval_minutes": 1440,
+      "poll_interval_description": "Daily",
+      "topics": ["ai", "governance", "regulation", "policy"],
+      "credibility_tier": "reputable",
+      "relevance_to_projects": ["PATH-HAIL", "enterprise-ai"],
+      "default_route": "10-Projects/External-Intelligence",
+      "alert_threshold_score": 0.80,
+      "expected_frequency": "3-5 per day",
+      "notes": "High-quality source on AI governance trends"
+    },
+    {
+      "id": "health-canada-announcements",
+      "name": "Health Canada Official Announcements",
+      "description": "Official updates and announcements from Health Canada",
+      "type": "api",
+      "url": "https://api.canada.ca/health-announcements",
+      "enabled": true,
+      "poll_interval_minutes": 360,
+      "poll_interval_description": "Every 6 hours",
+      "topics": ["health", "governance", "policy", "announcements"],
+      "credibility_tier": "authoritative",
+      "relevance_to_projects": ["PATH-HAIL", "enterprise-ai"],
+      "default_route": "10-Projects/External-Intelligence",
+      "alert_threshold_score": 0.75,
+      "expected_frequency": "0-2 per day",
+      "notes": "Official source — always high priority"
+    },
+    {
+      "id": "research-alerts-ai",
+      "name": "Research Alerts: AI & Machine Learning",
+      "description": "Recent academic papers and research on AI/ML",
+      "type": "rss",
+      "url": "https://example.com/feeds/research-ai.xml",
+      "enabled": true,
+      "poll_interval_minutes": 2880,
+      "poll_interval_description": "Every 2 days",
+      "topics": ["research", "ai", "machine-learning", "nlp"],
+      "credibility_tier": "reputable",
+      "relevance_to_projects": ["GREP-ExP", "enterprise-ai"],
+      "default_route": "10-Projects/External-Intelligence",
+      "alert_threshold_score": 0.80,
+      "expected_frequency": "1-3 per day",
+      "notes": "Academic research — moderate frequency"
+    },
+    {
+      "id": "news-general",
+      "name": "General News Feed",
+      "description": "Curated general news",
+      "type": "rss",
+      "url": "https://example.com/feeds/news.xml",
+      "enabled": true,
+      "poll_interval_minutes": 360,
+      "poll_interval_description": "Every 6 hours",
+      "topics": ["news", "general"],
+      "credibility_tier": "moderate",
+      "relevance_to_projects": [],
+      "default_route": "00-Archive/Signals",
+      "alert_threshold_score": 0.85,
+      "expected_frequency": "10+ per day",
+      "notes": "Low relevance by default — only critical items routed to inbox"
+    }
+  ],
+  "template": {
+    "id": "unique-feed-id",
+    "name": "Human-readable feed name",
+    "description": "What this feed covers",
+    "type": "rss | api | webhook",
+    "url": "https://...",
+    "enabled": true,
+    "poll_interval_minutes": 1440,
+    "poll_interval_description": "Daily | Every 6 hours | etc",
+    "topics": ["tag1", "tag2"],
+    "credibility_tier": "unknown | low | moderate | reputable | authoritative",
+    "relevance_to_projects": ["PROJECT-NAME"],
+    "default_route": "10-Projects/External-Intelligence",
+    "alert_threshold_score": 0.75,
+    "expected_frequency": "estimated items per day",
+    "notes": "optional notes about this source"
+  },
+  "instructions": {
+    "adding_a_new_feed": [
+      "1. Add object to signal_sources array",
+      "2. Set id (unique, lowercase, hyphens)",
+      "3. Set type (rss, api, webhook)",
+      "4. Set poll_interval_minutes based on frequency",
+      "5. Set credibility_tier (impacts signal scoring)",
+      "6. Set alert_threshold_score (higher = fewer alerts)",
+      "7. Enable in workflow (n8n ingestion scheduler)"
+    ]
+  },
+  "monitoring": {
+    "health_checks": [
+      {
+        "check": "Feed accessibility",
+        "frequency": "every poll",
+        "alert": "Feed returns 404 or timeout"
+      },
+      {
+        "check": "Update frequency",
+        "frequency": "daily",
+        "alert": "No new items in 2x expected interval"
+      },
+      {
+        "check": "Content quality",
+        "frequency": "weekly",
+        "alert": "Many items scored < 0.30"
+      }
+    ]
+  }
+}

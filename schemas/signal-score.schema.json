@@ -1,0 +1,265 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Signal Score Contract",
+  "description": "Scoring schema for dynamic signals (RSS, APIs, feeds, news)",
+  "type": "object",
+  "required": [
+    "signal_id",
+    "relevance",
+    "urgency",
+    "novelty",
+    "credibility",
+    "overall_classification"
+  ],
+  "properties": {
+    "signal_id": {
+      "type": "string",
+      "description": "UUID for this signal item",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "source_feed_id": {
+      "type": "string",
+      "description": "Which RSS/API feed this came from"
+    },
+    "title": {
+      "type": "string",
+      "description": "Signal title/headline"
+    },
+    "url": {
+      "type": "string",
+      "description": "URL to original signal"
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When signal was published"
+    },
+    "ingested_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When signal was ingested by PCA"
+    },
+    "relevance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "How relevant to active projects/domains (0.0-1.0)"
+    },
+    "relevance_factors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "factor": {
+            "type": "string",
+            "description": "Name of relevance factor"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Contribution to relevance score"
+          },
+          "reasoning": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "urgency": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "How time-sensitive (0.0-1.0)"
+    },
+    "urgency_factors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "factor": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "reasoning": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "novelty": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "How distinct from existing knowledge (0.0-1.0)"
+    },
+    "credibility": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Source trustworthiness (0.0-1.0)"
+    },
+    "credibility_tier": {
+      "type": "string",
+      "enum": ["unknown", "low", "moderate", "reputable", "authoritative"],
+      "description": "Source credibility classification"
+    },
+    "actionability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Degree to which signal calls for action"
+    },
+    "overall_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Weighted composite: custom formula per organization"
+    },
+    "overall_classification": {
+      "type": "string",
+      "enum": ["ignore", "archive", "review", "alert"],
+      "description": "Routing bin for this signal"
+    },
+    "classification_reasoning": {
+      "type": "string",
+      "description": "Why this classification was chosen"
+    },
+    "detected_topics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Topics/keywords detected in signal"
+    },
+    "detected_entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["person", "organization", "location", "event", "concept"]
+          },
+          "value": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Named entities found in signal"
+    },
+    "projects_mentioned": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Known projects referenced"
+    },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "Optional AI-generated 1-sentence summary"
+    },
+    "destination": {
+      "type": ["string", "null"],
+      "description": "Target folder in Obsidian (if routed to knowledge base)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags to apply if integrated"
+    },
+    "escalation_required": {
+      "type": "boolean",
+      "description": "Whether this needs human review"
+    },
+    "alert_channels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["push", "email", "slack", "dashboard"]
+      },
+      "description": "Where to send alert if triggered"
+    },
+    "deduplication": {
+      "type": "object",
+      "description": "Deduplication metadata",
+      "properties": {
+        "is_duplicate": {
+          "type": "boolean"
+        },
+        "duplicate_of_signal_id": {
+          "type": ["string", "null"]
+        },
+        "duplicate_confidence": {
+          "type": "number"
+        }
+      }
+    },
+    "processing_metadata": {
+      "type": "object",
+      "properties": {
+        "models_used": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "processing_time_ms": {
+          "type": "integer"
+        },
+        "cost_usd": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "signal_id": "880h1712-h62e-73g7-d949-669988773333",
+      "source_feed_id": "ai-news-feed",
+      "title": "New AI Governance Framework Released",
+      "url": "https://example.com/news/ai-governance",
+      "published_at": "2026-04-25T10:00:00Z",
+      "ingested_at": "2026-04-25T14:30:00Z",
+      "relevance": 0.75,
+      "relevance_factors": [
+        {
+          "factor": "mentions_governance",
+          "weight": 0.30,
+          "reasoning": "Active domain"
+        },
+        {
+          "factor": "mentions_ai",
+          "weight": 0.25,
+          "reasoning": "Strategic interest"
+        }
+      ],
+      "urgency": 0.45,
+      "novelty": 0.68,
+      "credibility": 0.85,
+      "credibility_tier": "reputable",
+      "actionability": 0.60,
+      "overall_score": 0.65,
+      "overall_classification": "review",
+      "classification_reasoning": "Moderate relevance and credibility, worth human review",
+      "detected_topics": ["governance", "ai", "policy"],
+      "detected_entities": [
+        {
+          "type": "organization",
+          "value": "Health Canada",
+          "confidence": 0.92
+        }
+      ],
+      "projects_mentioned": ["PATH-HAIL"],
+      "summary": "New framework addresses AI governance responsibilities and requirements.",
+      "destination": "/10-Projects/PATH-HAIL/External-Intelligence",
+      "tags": ["governance", "intelligence", "PATH-HAIL"],
+      "escalation_required": false
+    }
+  ]
+}
