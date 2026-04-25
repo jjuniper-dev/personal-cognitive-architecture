@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Quiz from './components/Quiz'
 import SchemaOutput from './components/SchemaOutput'
 import StateTrackerDashboard from './components/StateTrackerDashboard'
+import ADHDTrackerDashboard from './components/ADHDTrackerDashboard'
 import './App.css'
 
 export default function App() {
@@ -32,6 +33,10 @@ export default function App() {
     setView('tracker')
   }
 
+  const handleStartADHDTracker = () => {
+    setView('adhd-tracker')
+  }
+
   return (
     <div className="app">
       {view === 'menu' && (
@@ -58,6 +63,15 @@ export default function App() {
                 <span className="menu-title">State Tracker</span>
                 <span className="menu-desc">Real-time Markov Chain state management & tracking</span>
               </button>
+
+              <button
+                className="menu-btn adhd-btn"
+                onClick={handleStartADHDTracker}
+              >
+                <span className="menu-emoji">🧠</span>
+                <span className="menu-title">ADHD State Tracker</span>
+                <span className="menu-desc">Hyperfocus-preserving, rumination-preventing, dopamine-optimized</span>
+              </button>
             </div>
           </div>
         </div>
@@ -82,6 +96,15 @@ export default function App() {
             ← Back to Menu
           </button>
           <StateTrackerDashboard />
+        </div>
+      )}
+
+      {view === 'adhd-tracker' && (
+        <div className="tracker-view">
+          <button className="back-btn" onClick={() => setView('menu')}>
+            ← Back to Menu
+          </button>
+          <ADHDTrackerDashboard />
         </div>
       )}
     </div>

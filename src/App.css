@@ -69,6 +69,10 @@
   border-top: 4px solid #48bb78;
 }
 
+.menu-btn.adhd-btn {
+  border-top: 4px solid #f6ad55;
+}
+
 .menu-emoji {
   font-size: 48px;
 }
