@@ -1,0 +1,41 @@
+.quiz-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+.quiz-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.quiz-header h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.quiz-header p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.quiz-content {
+  min-height: 400px;
+}
+
+.quiz-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .quiz-header h1 {
+    font-size: 24px;
+  }
+
+  .quiz-header p {
+    font-size: 14px;
+  }
+}

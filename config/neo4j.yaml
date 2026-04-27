@@ -1,0 +1,83 @@
+neo4j:
+  uri: "bolt://localhost:7687"
+  username: "neo4j"
+  password: "${NEO4J_PASSWORD}"
+  database: "neo4j"
+
+graph:
+  name: "PersonalCognitiveArchitecture"
+  description: "Knowledge graph of personal cognitive patterns, values, and working style"
+
+nodes:
+  - label: "Self"
+    properties:
+      - name: string
+      - role: string
+      - created_date: datetime
+
+  - label: "Value"
+    properties:
+      - name: string
+      - description: string
+
+  - label: "LearningStyle"
+    properties:
+      - modality: string
+      - description: string
+
+  - label: "WorkContext"
+    properties:
+      - aspect: string
+      - description: string
+
+  - label: "Relationship"
+    properties:
+      - type: string
+      - preference: string
+
+  - label: "Energy"
+    properties:
+      - aspect: string
+      - description: string
+
+  - label: "Challenge"
+    properties:
+      - name: string
+      - impact: string
+
+relationships:
+  - type: "HAS_LEARNING_STYLE"
+    from: "Self"
+    to: "LearningStyle"
+
+  - type: "VALUES"
+    from: "Self"
+    to: "Value"
+
+  - type: "WORKS_IN"
+    from: "Self"
+    to: "WorkContext"
+
+  - type: "HAS_RELATIONSHIP_STYLE"
+    from: "Self"
+    to: "Relationship"
+
+  - type: "OPERATES_WITH_ENERGY"
+    from: "Self"
+    to: "Energy"
+
+  - type: "FACES_CHALLENGE"
+    from: "Self"
+    to: "Challenge"
+
+  - type: "SHAPES"
+    from: "LearningStyle"
+    to: "WorkContext"
+
+  - type: "ROOTED_IN"
+    from: "Relationship"
+    to: "Value"
+
+  - type: "ENERGIZED_BY"
+    from: "LearningStyle"
+    to: "Relationship"

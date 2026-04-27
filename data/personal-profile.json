@@ -1,0 +1,79 @@
+{
+  "profile": {
+    "self": {
+      "role": "Learner, Builder, Mentor, Strategic Thinker",
+      "core_values": ["Contribution", "Growth (self and others)", "Autonomy", "Authenticity"],
+      "mindset": ["Systems thinking", "Self-aware", "Growth-oriented", "Intentional"]
+    }
+  },
+  "learning_and_thinking": {
+    "learning_modalities": ["Visual (diagrams, charts, videos)", "Auditory (discussion, podcasts)"],
+    "learning_approaches": ["Trial and error (hands-on experimentation)", "Teaching others (explaining solidifies understanding)"],
+    "peak_thinking_time": "Early morning (before others awake)",
+    "thinking_style": "Systems thinking - sees interconnections",
+    "best_thinking_occurs_during": "Solo deep work time"
+  },
+  "work_context": {
+    "environment_preference": ["Mix of remote and office", "Solo deep work space"],
+    "work_pace_and_style": ["Balanced mix of focus and collaboration", "Deep focus, long stretches on one thing"],
+    "core_work_values": ["Learning (constantly growing)", "Impact (seeing real difference)", "Mastery (getting excellent)", "Autonomy (owning work and decisions)"],
+    "time_allocation_ideal": ["Most time on deep work, minimal meetings", "Time for reflection and strategic thinking"],
+    "professional_challenges": ["Networking and visibility (doesn't come naturally)", "Turning thoughts into action (ideas > execution gap)"],
+    "ideal_day_includes": ["Made tangible progress on something important", "Learned something new", "Finished early / had unscheduled free time"]
+  },
+  "relationships_and_social": {
+    "social_orientation": "Introvert",
+    "alone_time_need": ["Essential for recharging", "Necessary for best thinking and creativity"],
+    "preferred_interaction_modes": ["Deep 1-on-1 conversations", "Small group conversations (3-5 people)", "Async communication (writing, messaging)"],
+    "relationship_energizers": ["Mentoring and helping others grow", "Peers doing serious work together", "Meaningful collaboration"],
+    "relationship_drainers": ["Surface-level small talk", "Competitive/comparison dynamics"],
+    "relational_values": ["Authenticity (genuine, no masks)", "Growth (personal and others')", "Contribution (making real difference)"]
+  },
+  "energy_and_rhythm": {
+    "chronotype": "Early morning person",
+    "peak_performance_time": "Early morning (before others awake)",
+    "recovery_need": "Regular solo time to recharge",
+    "creative_necessity": "Alone time for best thinking",
+    "ideal_rhythm": "Protected deep focus blocks with intentional collaboration"
+  },
+  "strengths_and_capabilities": {
+    "natural_strengths": ["Teaching and mentoring", "Strategic/systems thinking", "Learning quickly", "Collaborative problem-solving", "Implementation through hands-on work"],
+    "development_edges": ["Self-promotion and networking", "Executing on ideas (closing the idea-to-action gap)"]
+  },
+  "neo4j_schema": {
+    "nodes": {
+      "Self": {
+        "properties": ["role", "core_values", "mindset"]
+      },
+      "LearningStyle": {
+        "properties": ["modalities", "approaches", "peak_time"]
+      },
+      "WorkContext": {
+        "properties": ["environment", "pace", "values", "time_allocation"]
+      },
+      "Relationships": {
+        "properties": ["social_orientation", "interaction_modes", "energizers", "drainers"]
+      },
+      "Energy": {
+        "properties": ["chronotype", "recharge_need", "creative_rhythm"]
+      },
+      "Values": {
+        "instances": ["Contribution", "Growth", "Autonomy", "Authenticity"]
+      },
+      "Challenge": {
+        "instances": ["Networking/Visibility", "Idea to Action"]
+      }
+    },
+    "relationships": [
+      "Self -[HAS_LEARNING_STYLE]-> LearningStyle",
+      "Self -[WORKS_IN]-> WorkContext",
+      "Self -[VALUES]-> Values",
+      "Self -[FACES_CHALLENGE]-> Challenge",
+      "LearningStyle -[SHAPES]-> WorkContext",
+      "WorkContext -[REQUIRES]-> Energy",
+      "Self -[IS]-> Relationships",
+      "Relationships -[ROOTED_IN]-> Values",
+      "LearningStyle -[ENERGIZED_BY]-> Relationships"
+    ]
+  }
+}
