@@ -8,6 +8,17 @@ import { fileURLToPath } from 'url'
 
 dotenv.config()
 
+// Safety guard for database writes
+if (process.env.CONFIRM_NEO4J_WRITE !== 'true') {
+  console.error('❌ CONFIRM_NEO4J_WRITE must be set to "true" to run database write scripts')
+  process.exit(1)
+}
+
+if (!process.env.NEO4J_PASSWORD || process.env.NEO4J_PASSWORD === 'password') {
+  console.error('❌ NEO4J_PASSWORD is missing or set to default "password". Set a secure password in .env')
+  process.exit(1)
+}
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 

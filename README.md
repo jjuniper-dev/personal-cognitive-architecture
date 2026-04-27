@@ -1,3 +1,28 @@
+# React Profile App
+
+## Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## ⚠️ Important: Database Scripts
+
+The Neo4j population scripts (`scripts/populate-graph.js` and `scripts/populate-markov-states.js`) write to the database and require:
+- `CONFIRM_NEO4J_WRITE=true` environment variable
+- A secure `NEO4J_PASSWORD` (not the default "password")
+
+These scripts will refuse to run without both conditions met.
+
+---
+
 # Personal Cognitive Architecture (PCA)
 
 ## One-Line Definition

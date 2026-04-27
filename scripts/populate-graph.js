@@ -5,6 +5,17 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+// Safety guard for database writes
+if (process.env.CONFIRM_NEO4J_WRITE !== 'true') {
+  console.error('❌ CONFIRM_NEO4J_WRITE must be set to "true" to run database write scripts')
+  process.exit(1)
+}
+
+if (!process.env.NEO4J_PASSWORD || process.env.NEO4J_PASSWORD === 'password') {
+  console.error('❌ NEO4J_PASSWORD is missing or set to default "password". Set a secure password in .env')
+  process.exit(1)
+}
+
 const uri = process.env.NEO4J_URI || 'bolt://localhost:7687'
 const user = process.env.NEO4J_USER || 'neo4j'
 const password = process.env.NEO4J_PASSWORD || 'password'

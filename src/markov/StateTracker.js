@@ -116,7 +116,7 @@ class StateTracker {
   }
 
   getDaysSinceState(state) {
-    const lastOccurrence = this.stateHistory
+    const lastOccurrence = [...this.stateHistory]
       .reverse()
       .find(s => s.state === state)
 

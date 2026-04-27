@@ -279,7 +279,7 @@ Once files appear in Obsidian vault, the n8n workflow will:
 4. Route to appropriate project folders
 5. Log complete audit trail
 
-See: `pca-iphone-to-obsidian-workflow.md`
+See: `./pca-iphone-to-obsidian-workflow.md`
 
 ---
 
