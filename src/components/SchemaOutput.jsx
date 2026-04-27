@@ -53,9 +53,13 @@ export default function SchemaOutput({ answers, points, achievements, onReset })
     document.body.removeChild(element)
   }
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     const text = JSON.stringify(schema, null, 2)
-    navigator.clipboard.writeText(text)
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch (error) {
+      alert('Failed to copy to clipboard. Try downloading instead.')
+    }
   }
 
   return (
