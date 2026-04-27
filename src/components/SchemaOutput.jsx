@@ -53,9 +53,20 @@ export default function SchemaOutput({ answers, points, achievements, onReset })
     document.body.removeChild(element)
   }
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     const text = JSON.stringify(schema, null, 2)
-    navigator.clipboard.writeText(text)
+
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable')
+      }
+
+      await navigator.clipboard.writeText(text)
+      alert('Schema copied to clipboard.')
+    } catch (error) {
+      console.warn('Copy failed:', error)
+      alert('Copy failed. You can manually select and copy the JSON shown above.')
+    }
   }
 
   return (

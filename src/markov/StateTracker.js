@@ -15,9 +15,8 @@ class StateTracker {
   transitionTo(newState) {
     const now = new Date()
 
-    // Log current state if exists
     if (this.currentState) {
-      const duration = Math.round((now - this.stateStartTime) / 60000) // minutes
+      const duration = Math.round((now - this.stateStartTime) / 60000)
       this.stateHistory.push({
         state: this.currentState,
         startTime: this.stateStartTime,
@@ -32,10 +31,8 @@ class StateTracker {
       })
     }
 
-    // Check for feedback loop risks
     this.checkFeedbackLoops(this.currentState, newState)
 
-    // Transition to new state
     this.currentState = newState
     this.stateStartTime = now
 
@@ -50,7 +47,6 @@ class StateTracker {
     const now = new Date()
     const recentStates = this.stateHistory.slice(-10)
 
-    // REFLECTION LOOP CHECK
     if (fromState === 'reflection' && toState === 'reflection') {
       const reflectionTime = this.stateHistory
         .filter(s => s.state === 'reflection')
@@ -69,7 +65,6 @@ class StateTracker {
       }
     }
 
-    // REFLECTION → LEARNING LOOP (consumes planning time)
     if (fromState === 'reflection' && toState === 'learning_input') {
       const reflectionDuration = this.stateHistory[this.stateHistory.length - 1]?.duration_minutes || 0
       if (reflectionDuration > 30) {
@@ -83,7 +78,6 @@ class StateTracker {
       }
     }
 
-    // RECHARGE ISOLATION CHECK
     if (fromState === 'recharge' && toState === 'recharge') {
       const rechargeTime = this.stateHistory
         .filter(s => s.state === 'recharge')
@@ -101,7 +95,6 @@ class StateTracker {
       }
     }
 
-    // COLLABORATION AVOIDANCE CHECK
     if (!recentStates.some(s => s.state === 'collaboration')) {
       if (this.getDaysSinceState('collaboration') > 3) {
         this.dailyLog.warnings.push({
@@ -116,7 +109,7 @@ class StateTracker {
   }
 
   getDaysSinceState(state) {
-    const lastOccurrence = this.stateHistory
+    const lastOccurrence = [...this.stateHistory]
       .reverse()
       .find(s => s.state === state)
 
@@ -143,7 +136,6 @@ class StateTracker {
       metrics[entry.state].total_minutes += entry.duration_minutes
     }
 
-    // Calculate averages
     for (const state in metrics) {
       metrics[state].average_duration = Math.round(
         metrics[state].total_minutes / metrics[state].count
@@ -176,12 +168,10 @@ class StateTracker {
     const data = JSON.stringify(this.dailyLog, null, 2)
 
     if (typeof window === 'undefined') {
-      // Node.js environment
       const fs = require('fs')
       fs.writeFileSync(filename || filename_default, data)
       console.log(`📊 Daily log saved: ${filename || filename_default}`)
     } else {
-      // Browser environment - download as file
       const blob = new Blob([data], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
