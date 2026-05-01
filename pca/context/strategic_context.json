@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-05-01",
+    "purpose": "Strategic and environmental context shaping AI platform decisions."
+  },
+  "strategic_context": {
+    "environment": {
+      "state": "Emerging AI maturity, fragmented implementations, strong governance requirements",
+      "challenge": "Align governance, runtime, and data into a cohesive enterprise AI platform"
+    },
+    "platform_model": {
+      "PATH": "Target-state AI control plane (governance + execution patterns)",
+      "HAIL": "Emerging runtime platform (PHAC-led implementation)"
+    },
+    "risk": "Lack of convergence architecture between PATH and HAIL",
+    "objective": "Unify PATH and HAIL into a coherent enterprise AI platform model"
+  },
+  "strategic_objectives": [
+    "Establish enterprise AI platform across HC/PHAC",
+    "Enable governed, auditable AI execution at scale",
+    "Align AI architecture to ADM accountability under TBS policy",
+    "Reduce duplication and fragmentation across AI initiatives"
+  ],
+  "current_priorities": [
+    "Align PATH (governance layer) and HAIL (runtime layer)",
+    "Develop AI capability models and enterprise heatmaps",
+    "Build unified enterprise AI + data platform narrative",
+    "Support ADM understanding of AI responsibilities",
+    "Strengthen ARB positioning for AI governance decisions",
+    "Integrate data and AI into a cohesive operating model"
+  ]
+}
