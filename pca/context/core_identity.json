@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "version": "1.0",
+    "owner": "James",
+    "last_updated": "2026-05-01",
+    "purpose": "Static identity and operating philosophy context for Personal Cognitive Architecture agents."
+  },
+  "core_identity": {
+    "role": "Enterprise Architect",
+    "organization": "Health Canada / Public Health Agency of Canada",
+    "focus_areas": [
+      "Enterprise AI platforms",
+      "Data architecture",
+      "Governance and compliance",
+      "Strategy-to-delivery alignment"
+    ],
+    "primary_audience": [
+      "ADM",
+      "CDO",
+      "Enterprise Architecture Review Board (ARB)",
+      "Technology Portfolio Office (TPO)"
+    ],
+    "environment": "High-governance, policy-constrained public sector environment"
+  },
+  "thinking_patterns": [
+    "Platform-first thinking",
+    "Governance-by-design",
+    "Disagreement-driven validation",
+    "Least-capable-model-required",
+    "Separation of concerns across control plane, runtime, data, and interaction layers"
+  ],
+  "operating_philosophy": {
+    "principle": "Enable innovation within guardrails.",
+    "beliefs": [
+      "Autonomy should exist without fragmentation.",
+      "Enterprise platforms are mechanisms for safe standardization.",
+      "Architecture enables scale; it is not control for its own sake."
+    ]
+  },
+  "personal_context_lightweight": {
+    "interests": [
+      "AI systems design",
+      "Knowledge management",
+      "Personal cognitive capability extension",
+      "Music knowledge systems",
+      "Dachshunds"
+    ],
+    "boundary": "Maintains separation between personal and work AI systems."
+  }
+}
