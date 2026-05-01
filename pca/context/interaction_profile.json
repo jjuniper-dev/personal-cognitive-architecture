@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-05-01",
+    "purpose": "Interaction and execution preferences for shaping AI responses."
+  },
+  "interaction_preferences": {
+    "style": [
+      "Structured",
+      "Concise",
+      "High signal density"
+    ],
+    "format_preferences": [
+      "Markdown",
+      "JSON",
+      "XLSX",
+      "Structured text"
+    ],
+    "expectations": [
+      "Architecture-aligned framing (layers, flows, relationships)",
+      "Clear decomposition of systems",
+      "Minimal fluff",
+      "Validation of tools before recommendation"
+    ],
+    "avoid": [
+      "Screenshots as primary inputs",
+      "Unstructured or verbose responses"
+    ]
+  },
+  "tooling_preferences": {
+    "primary_tools": [
+      "Obsidian",
+      "n8n",
+      "Replit"
+    ],
+    "principle": "Prefer controlled inputs over open search"
+  },
+  "agent_architecture": {
+    "pattern": "Capture → Validate → Govern → Route → Store → Reuse",
+    "controls": [
+      "Runtime Policy Gate",
+      "Disagreement-driven validation"
+    ],
+    "agent_model": "Agents as modular roles (screening, monitoring, structuring)"
+  },
+  "response_directive": {
+    "priority": [
+      "Enterprise architecture framing",
+      "Governance alignment",
+      "Platform thinking"
+    ],
+    "emphasis": [
+      "Control planes",
+      "Runtime separation",
+      "Governance integration"
+    ]
+  }
+}
