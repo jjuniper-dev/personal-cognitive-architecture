@@ -144,15 +144,39 @@ n8n → Obsidian → structured note in vault
 
 ## Documentation Structure
 
+### Strategic & Vision
 | Document | Purpose |
 |----------|---------|
-| **TECHNOLOGY_STACK.md** | Phase-based technology choices (Phase 1-3), architecture diagrams, component decisions |
 | **pca-north-star.md** | Vision, design position, and strategic direction |
 | **pca-intent-and-build-direction.md** | Current build phase and immediate objectives |
-| **pca-operating-model.md** | Governance, runtime rules, and escalation |
-| **pca-cognitive-reconciliation-engine.md** | Core differentiator logic and implementation |
-| **pca-compliance-and-governance.md** | GC/HC alignment, ethics, and standards |
 | **pca-active-priorities.md** | Current focus and execution order |
+
+### Architectural Foundations
+| Document | Purpose |
+|----------|---------|
+| **ARCHITECTURE.md** | 9-layer system design, data flows, governance gates, 8-phase roadmap |
+| **TECHNOLOGY_STACK.md** | Phase-based technology choices (Phase 1-3), component decisions, cost analysis |
+| **ARCHITECTURE_RECONCILIATION.md** | 8-phase roadmap with sprint assignments, gate criteria, blocking dependencies |
+| **pca-cognitive-reconciliation-engine.md** | Core differentiator: contradiction detection, Bayesian confidence updates |
+
+### Core Runtime & Governance
+| Document | Purpose |
+|----------|---------|
+| **pca-cognitive-control-plane.md** | Zero Trust Cognition: authorization layer, sensitivity classifier, policy gate, trust thresholds |
+| **runtime-policy-gate.md** | Policy definition language (YAML), approval tiers (ROUTINE/SENSITIVE/CRITICAL), escalation workflows |
+| **runtime-topology.md** | Deployment architecture: Phase 1-3 topologies, Docker Compose, networking, failover strategies |
+| **homelab-reference-architecture.md** | Sovereign edge runtime: hardware specs, installation guide, tuning, maintenance, cost analysis |
+| **agent-runtime-model.md** | Agent anatomy, execution semantics, autonomy boundaries, tool invocation, lifecycle management |
+| **observability-and-audit.md** | Execution tracing, lineage tracking, compliance logging, monitoring, retention policies |
+
+### Implementation & Planning
+| Document | Purpose |
+|----------|---------|
+| **SPRINT_5_VALIDATION_LAYER.md** | Dual-agent scoring model, 4-dimension framework, agreement logic, routing decisions |
+| **SPRINT_5_N8N_SETUP_VALIDATION_LAYER.md** | 60-90 minute n8n implementation guide, 9-node workflow, system prompts, testing |
+| **SPRINT_5_QUICKSTART.md** | 45-minute implementation path for Phase 1 validation layer |
+| **ARCHITECTURAL_REVIEW_REQUEST_FOR_OPUS.md** | Architecture review package and questions for Claude Opus 4.7 |
+| **pca-compliance-and-governance.md** | GC/HC alignment, ethics by design, responsible AI standards |
 | **pca-readiness-assessment.md** | State vs intent gap analysis |
 
 ## Technology Stack
