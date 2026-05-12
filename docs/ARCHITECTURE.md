@@ -41,7 +41,7 @@ tags: [architecture, 9-layer, pca]
 └────────────────────────┬────────────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────────────┐
-│        REASONING & AGENTS LAYER (Phase 3)                          │
+│        REASONING & AGENTS LAYER (Phase 4)                          │
 │  LLMs (Tiered) │ Agent Framework (MCP) │ RAG │ Tools                │
 └────────────────────────┬────────────────────────────────────────────┘
                          │
@@ -51,7 +51,7 @@ tags: [architecture, 9-layer, pca]
 └────────────────────────┬────────────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────────────┐
-│          OUTPUT GENERATION LAYER (Phase 3)                          │
+│          OUTPUT GENERATION LAYER (Phase 5)                          │
 │  Presentations │ Documents │ Dashboards │ Audio Summaries            │
 └────────────────────────┬────────────────────────────────────────────┘
                          │
@@ -63,6 +63,19 @@ tags: [architecture, 9-layer, pca]
                     GOVERNANCE & ETHICS
            Privacy • Bias Detection • Human-in-Loop • Audit
 ```
+
+## 8-Phase Roadmap
+
+| Phase | Sprints | Focus | Status |
+|-------|---------|-------|--------|
+| **1** | 1-5 | Capture & Validation | ✅ Sprint 5 Ready |
+| **2** | 6-8 | Cognitive Reconciliation | 🔲 Gate: 50 INBOX decisions |
+| **3** | 9-12 | Semantic Indexing & Hot/Cold | 🔲 Gate: GPU acquisition |
+| **4** | 13-15 | Reasoning & Agents (MCP) | 🔲 Planned |
+| **5** | 16-18 | Output Generation | 🔲 Planned |
+| **6** | 19-21 | Outcome Measurement | 🔲 Planned |
+| **7** | 22-24 | Feedback & Learning (RLHF-Lite) | 🔲 Planned |
+| **8** | 25+ | Outcome Evolution | 🔲 Ongoing |
 
 ## Layer-by-Layer Breakdown
 
@@ -225,70 +238,18 @@ Trigger action if needed
 - **Structure:** Nodes (documents), links (relationships), backlinks (reverse links), tags, properties
 - **Use Case:** Human-readable knowledge, navigation, editing
 - **Location:** `/Captures/` folder in Obsidian vault
-- **Example Node:**
-
-```markdown
----
-title: "Agentic System Design Patterns"
-tags: [architecture, agents, design-patterns]
-created: 2026-05-11
-confidence: 95
-routing: PROMOTE
----
-
-# Agentic System Design Patterns
-
-[Link to related concept](concept-link)
-[Reference to source](youtube-capture)
-
-## Key Ideas
-- Agent disagreement signals uncertainty better than confidence scores
-- Human-in-the-loop gates ensure accountability
-- ...
-```
 
 #### 5b. Neo4j Graph Database
 
 - **Format:** Property graph (nodes + relationships + properties)
 - **Structure:** Semantic relationships, indexes, constraints
 - **Use Case:** Machine-readable knowledge, graph queries, pattern matching
-- **Schema:**
-
-```cypher
-(VideoCapture {
-  id, title, url, source,
-  created_at, validated_at,
-  screening_credibility, screening_quality, screening_relevance, screening_alignment,
-  critical_credibility, critical_quality, critical_relevance, critical_alignment,
-  credibility_score, quality_score, relevance_score, alignment_score,
-  overall_score, confidence, routing, agents_agree
-})
-
-(Concept {
-  id, name, definition,
-  created_at, updated_at,
-  confidence_score
-})
-
-(Author {
-  id, name, expertise_areas,
-  credibility_score
-})
-
-RELATIONSHIPS:
-- (VideoCapture)-[:CAPTURES]->(Concept)
-- (VideoCapture)-[:CREATED_BY]->(Author)
-- (Concept)-[:RELATES_TO]->(Concept)
-- (Concept)-[:REINFORCED_BY]->(VideoCapture)
-- (Concept)-[:CONTRADICTED_BY]->(VideoCapture)
-```
 
 #### 5c. Vector Database (Chroma)
 
 - **Format:** Embeddings + metadata
 - **Structure:** Semantic vectors (BGE-M3 embeddings, local via Ollama), similarity indices
-- **Use Case:** Semantic search ("find similar ideas"), RAG retrieval
-- **Flow:** Document → BGE-M3 embedding (local) → Chroma index → Similarity search
+- **Use Case:** Semantic search, RAG retrieval
 
 **Synchronization:**
 
@@ -327,25 +288,7 @@ RELATIONSHIPS:
    - File system access (read/write Obsidian)
    - Database queries (Neo4j Cypher)
 
-**Example Agentic Flow:**
-
-```
-User Question: "What are the key design patterns for agentic systems?"
-    ↓
-Agent routes to RAG system
-    ↓
-RAG queries Neo4j: MATCH (c:Concept {tags: "agents"}) RETURN c
-    ↓
-RAG queries Chroma: semantic search "agentic design patterns"
-    ↓
-Combines results → injects into Claude Sonnet
-    ↓
-Claude synthesizes answer from retrieved context
-    ↓
-Output: Comprehensive answer with citations
-```
-
-**Status:** 🔲 Phase 3 (planned after validation + reconciliation)
+**Status:** 🔲 Phase 4 (planned after Phase 3 semantic indexing)
 
 ### Layer 7: Execution & Automation Layer 🔵
 
@@ -355,11 +298,11 @@ Output: Comprehensive answer with citations
 
 1. **n8n Workflows**
    - Event-driven: webhooks, schedules, API triggers
-   - Multi-lane architecture (Lane A + Lane B for parallelization)
-   - YouTube processor, Voice processor, Chat processor (see Sprint 5, 6, 7)
+   - Multi-lane architecture
+   - Processors for YouTube, Voice, Chat, Documents
 
 2. **Task Management**
-   - Create tasks from captured content ("Action items extracted")
+   - Create tasks from captured content
    - Schedule follow-ups
    - Integrate with calendar, to-do apps
 
@@ -399,7 +342,7 @@ Output: Comprehensive answer with citations
    - Podcast-style weekly recaps
    - Local generation (privacy-preserving)
 
-**Status:** 🔲 Phase 3 (planned)
+**Status:** 🔲 Phase 5 (planned after Phase 4 agents)
 
 ### Layer 9: Infrastructure & Deployment 🔵
 
@@ -428,33 +371,6 @@ Output: Comprehensive answer with citations
    - Backblaze B2 for Canadian cloud storage
    - Automated daily backups
    - Point-in-time recovery
-
-**Deployment Architecture:**
-
-```
-Home PC
-├── Docker Desktop
-│   ├── FastAPI Container
-│   │   └── Python, uvicorn, app code
-│   ├── Neo4j Container
-│   │   └── Graph DB, 7687 (bolt), 7474 (HTTP)
-│   ├── n8n Container
-│   │   └── Workflow automation
-│   ├── Ollama Container (Phase 2)
-│   │   └── Qwen2.5-7B, Qwen2.5-32B, BGE-M3 on RTX 3090
-│   ├── ChromaDB Container (Phase 2)
-│   │   └── Vector store
-│   ├── PostgreSQL Container (Phase 2)
-│   │   └── Run logs, session history
-│   └── Redis Container (Phase 2)
-│       └── Session cache
-├── Obsidian Vault
-│   └── `/Captures/` markdown files
-├── Restic + Backblaze B2
-│   └── Encrypted daily backups
-└── GitLab CI/CD
-    └── Automated tests, builds
-```
 
 **Status:** ✅ Docker Compose working (Sprint 1), 🔲 Backup automation, 🔲 GitLab CI/CD
 
@@ -487,90 +403,6 @@ Home PC
 - Obsidian provides audit trail (timestamped, versioned)
 - Neo4j stores full provenance graph
 - Agent-specific scores enable traceability
-
-## Data Flow Examples
-
-### Example 1: YouTube Video → Integration
-
-```
-1. YouTube Shortcut
-   User taps "Capture" in YouTube app
-   Sends: {url, title, transcript} to FastAPI
-
-2. FastAPI (Capture Layer)
-   Creates VideoCapture node in Neo4j
-   Returns immediately with capture ID (low latency)
-   Async: sends webhook to n8n
-
-3. n8n (Validation Layer)
-   Screening Agent (Claude Sonnet) scores video
-   Critical Agent (Claude Haiku) scores video
-   Compares scores, determines confidence
-   Routes to PROMOTE/INBOX/ARCHIVE
-
-4. n8n (Integration)
-   If PROMOTE: creates Obsidian note
-   Updates Neo4j with validation fields (agent-specific + composite scores)
-   Indexes in Chroma (semantic search)
-
-5. Neo4j Graph
-   VideoCapture node now has:
-   - screening_credibility: 92
-   - critical_credibility: 89
-   - credibility_score: 90.5
-   - overall_score: 89
-   - routing: PROMOTE
-   - agents_agree: true
-   - obsidian_file: path
-
-6. User
-   Opens Obsidian, sees new note with validation report
-   Knowledge integrated into existing graph
-```
-
-### Example 2: Reconciliation (Phase 2)
-
-```
-1. New VideoCapture scored as PROMOTE
-
-2. Reconciliation Engine (Phase 2)
-   Query Neo4j: "Similar concepts?"
-   Find existing Concept: "Agentic Systems"
-
-3. Relationship Detection
-   New video reinforces existing concept
-   Increases confidence: 85% → 92%
-
-4. User Review
-   Sees suggestion: "This reinforces 'Agentic Systems' concept"
-   Approves or provides feedback
-
-5. Model Evolution
-   If 10+ videos REINFORCE same concept:
-   Suggest: "Time to synthesize research into major paper?"
-```
-
-## Design Trade-offs
-
-| Decision | Pro | Con |
-|----------|-----|-----|
-| **Dual agents (Sonnet + Haiku)** | Interpretable uncertainty, asymmetric thinking | Higher cost (~CAD $0.018/item) |
-| **Obsidian + Neo4j + Chroma** | Best of each (human + machine + semantic) | More complex sync, extra infrastructure |
-| **Local processing (Ollama)** | Privacy, no latency, cost reduction | Requires GPU, inference time |
-| **3-tier routing (PROMOTE/INBOX/ARCHIVE)** | Explicit human review, quality control | Manual effort required |
-| **Agreement threshold <15 points** | Conservative (fewer false positives) | May be too strict, needs tuning |
-| **Relevance hard floor ≥60** | Non-negotiable quality gate | May filter valuable borderline content |
-| **MCP agents** | Standardized tool use, interoperability | Still early technology, limited maturity |
-
-## Roadmap
-
-| Phase | Sprints | Focus | Status |
-|-------|---------|-------|--------|
-| **1** | 1-5 | Input capture, basic validation | ✅ Sprint 5 Ready |
-| **2** | 6-10 | Reconciliation, local inference, semantic indexing | 🔲 Planned |
-| **3** | 11-15 | Reasoning agents, RAG, MCP, output generation | 🔲 Planned |
-| **4** | 16-20 | Enterprise compliance, governance, scaling | 🔲 Planned |
-| **5+** | 21+ | Outcome measurement, RLHF, system evolution | 🔲 Future |
 
 ## Key References
 
