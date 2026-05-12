@@ -146,12 +146,12 @@ n8n → Obsidian → structured note in vault
 
 | Document | Purpose |
 |----------|---------|
+| **TECHNOLOGY_STACK.md** | Phase-based technology choices (Phase 1-3), architecture diagrams, component decisions |
 | **pca-north-star.md** | Vision, design position, and strategic direction |
 | **pca-intent-and-build-direction.md** | Current build phase and immediate objectives |
 | **pca-operating-model.md** | Governance, runtime rules, and escalation |
 | **pca-cognitive-reconciliation-engine.md** | Core differentiator logic and implementation |
 | **pca-compliance-and-governance.md** | GC/HC alignment, ethics, and standards |
-| **pca-technology-stack.md** | Personal and enterprise technology choices |
 | **pca-active-priorities.md** | Current focus and execution order |
 | **pca-readiness-assessment.md** | State vs intent gap analysis |
 
