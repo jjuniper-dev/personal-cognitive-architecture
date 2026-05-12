@@ -42,7 +42,7 @@ Follow this guide step-by-step while building in the Shortcuts app.
 
 ---
 
-## Step 2: Ask for Text Content
+## Step 2: Ask for Text Content (Conditional)
 
 **Action to add**: `Ask for [Text]`
 
@@ -51,12 +51,32 @@ Follow this guide step-by-step while building in the Shortcuts app.
 3. Configure:
    - **Question**: `What's on your mind?`
    - **Variable name**: `text_content`
+   - **Show When**: Add condition → `capture_type` is not equal to `Voice note`
+
+**Why**: Only ask for text if user didn't select "Voice note"
 
 **✓ Done**: Variable `text_content` saved
 
 ---
 
-## Step 3: Get Current Timestamp
+## Step 3: Ask for Voice Note (Conditional)
+
+**Action to add**: `Ask for [Audio]`
+
+1. Tap **"+"** at bottom, search: **"ask for"**
+2. Select **"Ask for [Audio]"** (microphone icon)
+3. Configure:
+   - **Question**: `Record voice note:`
+   - **Variable name**: `audio_file`
+   - **Show When**: Add condition → `capture_type` is equal to `Voice note`
+
+**Why**: Only ask for audio if user selected "Voice note"
+
+**✓ Done**: Variable `audio_file` saved
+
+---
+
+## Step 4: Get Current Timestamp
 
 **Action to add**: `Current Date and Time`
 
@@ -64,21 +84,21 @@ Follow this guide step-by-step while building in the Shortcuts app.
 2. Select **"Current Date and Time"** (calendar icon)
 3. This adds current date/time to your shortcut
 4. Tap the action, look for **"Format"** option
-5. Change format to: **`yyyy-MM-dd'T'HHmmss`** (or similar timestamp format)
+5. Change format to: **`yyyy-MM-dd'T'HHmmss`** (exact format: `yyyy-MM-dd'T'HHmmss`)
 6. **Variable name**: `timestamp`
 
 **✓ Done**: Variable `timestamp` saved
 
 ---
 
-## Step 4: Ask for Domain
+## Step 5: Ask for Domain
 
 **Action to add**: `Ask for [Text]`
 
 1. Tap **"+"**, search: **"ask for"**
 2. Select **"Ask for [Text]"**
 3. Configure:
-   - **Question**: `Domain? (work/personal/research/other)`
+   - **Question**: `Domain? (or leave blank)`
    - **Variable name**: `domain`
    - Leave default blank
 
@@ -86,7 +106,7 @@ Follow this guide step-by-step while building in the Shortcuts app.
 
 ---
 
-## Step 5: Ask for Tags
+## Step 6: Ask for Tags
 
 **Action to add**: `Ask for [Text]`
 
@@ -101,7 +121,7 @@ Follow this guide step-by-step while building in the Shortcuts app.
 
 ---
 
-## Step 6: Ask for Sensitivity
+## Step 7: Ask for Sensitivity
 
 **Action to add**: `Ask for [Menu]`
 
@@ -120,7 +140,7 @@ Follow this guide step-by-step while building in the Shortcuts app.
 
 ---
 
-## Step 7: Build Markdown Content
+## Step 8: Build Markdown Content
 
 **Action to add**: `Text`
 
@@ -135,7 +155,7 @@ source_type: [capture_type]
 created: [timestamp]
 domain: [domain]
 sensitivity: [sensitivity]
-tags: [tags_input]
+tags: [[tags_input]]
 confidence: 0.5
 ---
 
@@ -154,7 +174,7 @@ confidence: 0.5
 
 ---
 
-## Step 8: Generate Filename
+## Step 9: Generate Filename
 
 **Action to add**: `Text`
 
@@ -172,7 +192,7 @@ capture-[timestamp]-[domain].md
 
 ---
 
-## Step 9: Save File to Obsidian
+## Step 10: Save File to Obsidian
 
 **Action to add**: `Write Text to File`
 
@@ -198,7 +218,7 @@ capture-[timestamp]-[domain].md
 
 ---
 
-## Step 10: Show Confirmation
+## Step 11: Show Confirmation
 
 **Action to add**: `Show Result`
 
@@ -249,6 +269,48 @@ Now you can also:
 
 ---
 
+## Optional Enhancements
+
+Once you have the basic shortcut working, you can add:
+
+### Enhancement 1: Voice Transcription
+
+After Step 3 (Ask for Voice Note), add:
+
+1. Search: **"ask for"**
+2. Select **"Ask for [Text]"**
+3. Configure:
+   - **Question**: `Summarize voice note (or skip)?`
+   - **Variable name**: `voice_summary`
+   - **Show When**: `capture_type` is equal to `Voice note`
+4. In Step 8 (Build Markdown), add to content:
+   ```
+   ## Voice Note
+   [voice_summary]
+   ```
+
+(Full transcription with Whisper happens in n8n)
+
+### Enhancement 2: Screenshot Capture
+
+1. After Step 1, add **"Ask for [Image]"**
+   - **Question**: `Capture screenshot?`
+   - **Show When**: `capture_type` is equal to `Screenshot`
+   - **Variable name**: `screenshot`
+2. Before Step 10, add **"Save Image to Obsidian"** (or **"Save Image"**)
+   - **Path**: `20-Ideas/Unstructured/attachments/`
+   - **Image**: `[screenshot]`
+   - **Filename**: `screenshot-[timestamp].png`
+3. Add to markdown: `![Screenshot](attachments/screenshot-[timestamp].png)`
+
+### Enhancement 3: Location Capture
+
+1. Add **"Current Location"** action
+2. **Variable name**: `location`
+3. Add to frontmatter: `location: [location]`
+
+---
+
 ## Troubleshooting
 
 ### Obsidian file location not found
@@ -283,6 +345,17 @@ See: `pca-iphone-to-obsidian-workflow.md`
 
 ---
 
+## Summary
+
+You've built an 11-step shortcut that:
+- ✅ Captures 4 types: quick thoughts, voice notes, screenshots, links
+- ✅ Collects metadata: timestamp, domain, tags, sensitivity
+- ✅ Saves to Obsidian vault with proper frontmatter
+- ✅ Shows confirmation when complete
+- ✅ Includes optional enhancements for transcription, images, location
+
+---
+
 **Status**: Ready to build ✓
-**Time to complete**: ~15 minutes
+**Time to complete**: ~15 minutes (+ 5 min for optional enhancements)
 **Next step**: Run shortcut and verify file appears in Obsidian
