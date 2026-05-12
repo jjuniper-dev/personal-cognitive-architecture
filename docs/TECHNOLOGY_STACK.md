@@ -30,7 +30,7 @@ Prove ingestion loop: **n8n → Obsidian → structured note**
 ### Technology Choices
 
 | Component | Technology | Role | Rationale |
-|-----------|-----------|------|-----------|
+|-----------|-----------|------|--------|
 | **Knowledge Store** | Obsidian | Canonical memory | Human-readable, version-controllable, local-first |
 | **Automation Orchestration** | n8n (Docker) | Workflow engine | Low-code, flexible, self-hosted capable |
 | **Development Environment** | VS Code | Coding & note editing | Integrated, extensible, markdown support |
@@ -106,8 +106,8 @@ Prove ingestion loop: **n8n → Obsidian → structured note**
 **Cost Estimate (Phase 1)**:
 
 - ~50 videos/day × 365 days = ~18,250 videos/year
-- Claude Sonnet + Claude Haiku dual-agent scoring: ~CAD $0.04–0.07/video
-- **Annual budget: CAD $730–1,250**
+- Claude Sonnet + Claude Haiku dual-agent scoring: ~CAD $0.018/video
+- **Annual budget: ~CAD $330**
 
 ## Phase 2: Self-Hosted Migration
 
@@ -118,7 +118,7 @@ Local inference, semantic indexing, structured session support, observability
 ### Technology Additions
 
 | Component | Technology | Role | Rationale |
-|-----------|-----------|------|-----------|
+|-----------|-----------|------|--------|
 | **LLM (Local — Fast/Real-time)** | Qwen2.5-7B via Ollama | On-device reasoning, real-time chat | Low latency, privacy, cost reduction |
 | **LLM (Local — Deep Synthesis)** | Qwen2.5-32B via Ollama | Deep analysis, reconciliation | Higher quality than 7B, still local |
 | **Embedding Model** | BGE-M3 via Ollama | Semantic search, local embeddings | Privacy-first, multilingual, no external dependency |
@@ -132,13 +132,13 @@ Local inference, semantic indexing, structured session support, observability
 ```
 Phase 1 Components + New Layer:
 
-    ┌──────────────────────────────────────┐
-    │  Local LLM Inference (RTX 3090)      │
-    │  ├─ Qwen2.5-7B (fast)                │
-    │  ├─ Qwen2.5-32B (deep)               │
-    │  ├─ BGE-M3 embeddings                │
-    │  └─ Quantization: 4-bit              │
-    └────────────┬─────────────────────────┘
+    ┌──────────────────────────────────┐
+    │  Local LLM Inference (RTX 3090)  │
+    │  ├─ Qwen2.5-7B (fast)            │
+    │  ├─ Qwen2.5-32B (deep)           │
+    │  ├─ BGE-M3 embeddings            │
+    │  └─ Quantization: 4-bit          │
+    └────────────┬─────────────────────┘
                  │
     ┌────────────▼──────────────────┐
     │  ChromaDB Vector Store        │
@@ -150,10 +150,10 @@ Phase 1 Components + New Layer:
     │  (Knowledge graph, reconciliation state)  │
     └────────────┬──────────────────────────────┘
                  │
-    ┌────────────▼──────────────────────┐
-    │  Reasoning & Reconciliation       │
+    ┌────────────▼──────────────────┐
+    │  Reasoning & Reconciliation    │
     │  (Cognitive Reconciliation Engine)│
-    └────────────┬──────────────────────┘
+    └────────────┬──────────────────┘
                  │
               Obsidian (Canonical)
 ```
@@ -175,7 +175,7 @@ Docker Compose:
 ### Knowledge Store Layers (Phase 2)
 
 | Layer | Technology | Role | Sync Direction |
-|-------|-----------|------|-----------------|
+|-------|-----------|------|----------------|
 | Canonical (Human) | Obsidian | Source of truth | Primary |
 | Semantic Graph | Neo4j | Relationship modeling, reconciliation | Obsidian → Neo4j (one-way) |
 | Vector Index | ChromaDB | Semantic search, RAG retrieval | Neo4j → ChromaDB (derived) |
@@ -191,7 +191,7 @@ GC/HC compliance, enterprise governance, multi-tenant orchestration, formal outp
 ### Technology Stack
 
 | Component | Technology | Role | Rationale |
-|-----------|-----------|------|-----------|
+|-----------|-----------|------|--------|
 | **Cloud Platform** | Azure | Enterprise infrastructure | GC-approved, compliance-ready |
 | **Data Lakehouse** | Microsoft Fabric | Analytics & integration | Enterprise-grade data management |
 | **Automation Platform** | Power Automate | Enterprise workflows | Native Azure integration |
