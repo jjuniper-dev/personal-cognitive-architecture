@@ -41,7 +41,7 @@ tags: [architecture, 9-layer, pca]
 └────────────────────────┬────────────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────────────┐
-│        REASONING & AGENTS LAYER (Phase 3)                          │
+│        REASONING & AGENTS LAYER (Phase 4)                          │
 │  LLMs (Tiered) │ Agent Framework (MCP) │ RAG │ Tools                │
 └────────────────────────┬────────────────────────────────────────────┘
                          │
@@ -51,7 +51,7 @@ tags: [architecture, 9-layer, pca]
 └────────────────────────┬────────────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────────────┐
-│          OUTPUT GENERATION LAYER (Phase 3)                          │
+│          OUTPUT GENERATION LAYER (Phase 5)                          │
 │  Presentations │ Documents │ Dashboards │ Audio Summaries            │
 └────────────────────────┬────────────────────────────────────────────┘
                          │
@@ -288,7 +288,7 @@ Trigger action if needed
    - File system access (read/write Obsidian)
    - Database queries (Neo4j Cypher)
 
-**Status:** 🔲 Phase 3 (planned after validation + reconciliation)
+**Status:** 🔲 Phase 4 (planned after Phase 3 semantic indexing)
 
 ### Layer 7: Execution & Automation Layer 🔵
 
@@ -342,7 +342,7 @@ Trigger action if needed
    - Podcast-style weekly recaps
    - Local generation (privacy-preserving)
 
-**Status:** 🔲 Phase 3 (planned)
+**Status:** 🔲 Phase 5 (planned after Phase 4 agents)
 
 ### Layer 9: Infrastructure & Deployment 🔵
 
