@@ -174,6 +174,8 @@ Resources that indicate ecosystem movement or future architectural direction.
 | CTCR-006 | Ollama | Tool / Runtime | GitHub | Candidate | Local model runtime for self-hosted AI execution. | Assess for local PCA inference and private experimentation. |
 | CTCR-007 | Open WebUI | Tool / Interface | GitHub | Candidate | Local AI interaction layer for self-hosted models. | Assess as optional UI layer for local model interaction. |
 | CTCR-008 | Langfuse | Tool / Observability | GitHub | Candidate | LLM observability, tracing, evaluation, and prompt management. | Assess as observability/evaluation pattern for PCA agents. |
+| CTCR-009 | NVIDIA NIM / API Catalog Free Developer Access | Cloud AI API / Model Serving | NVIDIA Developer Program | Candidate | Free prototyping access to NVIDIA-hosted NIM endpoints and downloadable NIM microservices; useful for model experimentation, OpenAI-compatible API testing, and agent/runtime comparison. | Validate current limits, data handling terms, model catalogue, and suitability for non-sensitive PCA experiments. |
+| CTCR-010 | NVIDIA LaunchPad | Cloud Lab / Reference Environment | NVIDIA | Candidate | Free short-term hands-on labs for AI, data science, infrastructure, and NVIDIA enterprise software patterns. Useful for learning, reference architecture review, and platform capability exploration. | Identify relevant labs for AI runtime, data science, model serving, and enterprise platform patterns. |
 
 ## Backlog Translation Examples
 
@@ -185,10 +187,14 @@ Example backlog items:
 - Deploy Coolify in a sandbox and assess whether it can support PCA application deployment.
 - Mine awesome-selfhosted for capture, processing, storage, reasoning, and output-generation candidates.
 - Assess Langfuse as a traceability and evaluation layer for PCA agent workflows.
+- Test NVIDIA NIM/API Catalog free developer access as a non-sensitive model experimentation endpoint.
+- Review NVIDIA LaunchPad labs for reference architectures relevant to PCA runtime and AI platform patterns.
 
 ## Governance Notes
 
 The CTCR supports human-in-the-loop governance. Registry inclusion does not imply approval. Each candidate must be assessed for privacy, security, licensing, operational resilience, maintainability, and alignment with PCA principles before promotion.
+
+Cloud-hosted free tiers require additional scrutiny before use with any sensitive or personal data. Confirm terms, logging behavior, data retention, usage limits, and production restrictions before moving beyond experimentation.
 
 ## Review Cadence
 
