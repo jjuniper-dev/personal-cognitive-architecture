@@ -166,18 +166,19 @@ Raw Input → Extraction → Parsing → Normalization → Structured Data
 
 **Purpose:** Intelligently filter content before integration into knowledge system
 
-**Key Innovation:** Dual-agent screening with agreement-driven confidence
+**Key Innovation:** **Disagreement-Driven Validation** — a dueling-agent assurance pattern where one agent scores or proposes, a second agent challenges using Socratic critique, and material disagreement becomes a governance signal.
 
 **Components:**
 1. **Screening Agent** (Claude Sonnet, T=0.3)
    - Conservative assessment
    - Consistent, deterministic scoring
    - Focuses on core quality dimensions
+   - Produces the primary validation proposal
 
-2. **Critical Agent** (Claude Haiku, T=0.8)
-   - Independent assessment
-   - More exploratory thinking
-   - Probes for edge cases and gaps
+2. **Socratic Critic Agent** (Claude Haiku, T=0.8)
+   - Independent critical assessment
+   - Uses Socratic challenge to test assumptions, weak evidence, edge cases, and premature promotion
+   - Probes for gaps, contradictions, misalignment, and overconfidence
 
 3. **4-Dimension Scoring:**
    - **Source Credibility** (0-100): Creator trustworthiness
@@ -191,17 +192,19 @@ Raw Input → Extraction → Parsing → Normalization → Structured Data
    - Partial disagreement = medium confidence (40-70%)
    - Most disagree = low confidence (20%)
    - **Per-dimension floor:** If Relevance <60, routes to INBOX regardless of other scores
+   - Material disagreement routes to revision, reconciliation, INBOX, or human review
 
 5. **3-Tier Routing:**
    - **PROMOTE** (>80 overall AND all dimensions pass): Integrate immediately
-   - **INBOX** (60-80 OR per-dimension floor triggered): Manual review required
+   - **INBOX** (60-80 OR per-dimension floor triggered OR material disagreement): Manual review required
    - **ARCHIVE** (<60): Store but don't prioritize
 
 **Why Not Single Agent + Confidence?**
 - Model confidence is unreliable (overconfident on easy, underconfident on hard)
 - Agent disagreement is interpretable (tells us WHERE confidence is low)
+- Socratic critique exposes hidden assumptions instead of simply producing a second score
 - Dual agents naturally integrate human review
-- Multi-agent reduces correlated failure modes
+- Multi-agent validation reduces correlated failure modes
 
 **Status:** ✅ Sprint 5 Complete (ready to build in n8n)
 
@@ -348,48 +351,258 @@ RELATIONSHIPS:
 
 ### Layer 6: Reasoning & Agents Layer 🔵
 
-**Purpose:** Intelligent reasoning over knowledge graph, answer questions, generate insights
+**Purpose:** Governed cognitive execution over the PCA knowledge graph: gather, reconcile, evaluate, promote, retrieve, synthesize, and trigger controlled actions without collapsing governance, memory, and automation into a single undifferentiated agent.
 
-**Components:**
+**Core Operating Model:** **GREP — Gather → Reconcile → Evaluate → Promote**
 
-1. **LLMs (Tiered)**
-   - **Claude Sonnet** (cloud): Complex reasoning, generation
-   - **Claude Haiku** (cloud): Fast, simple tasks
-   - **Ollama local** (Qwen2.5-7B): Privacy-critical, offline reasoning
+GREP is the onboarding flow for knowledge-moving agents. It ensures that new knowledge is captured with provenance, reconciled against existing memory, evaluated through Disagreement-Driven Validation, and promoted only through governed routing.
 
-2. **Agent Framework (MCP-based)**
-   - Agents can query Neo4j as tools via MCP
-   - Agents can execute functions: search, create notes, schedule tasks
-   - Natural language control of system
-
-3. **Retrieval (RAG)**
-   - LlamaIndex for semantic retrieval
-   - Query Neo4j + Chroma for context
-   - Inject retrieved context into LLM prompts
-
-4. **Tools & Integrations**
-   - Custom API calls (GitHub, Slack, etc.)
-   - File system access (read/write Obsidian)
-   - Database queries (Neo4j Cypher)
-
-**Example Agentic Flow:**
-```
-User Question: "What are the key design patterns for agentic systems?"
-    ↓
-Agent routes to RAG system
-    ↓
-RAG queries Neo4j: MATCH (c:Concept {tags: "agents"}) RETURN c
-    ↓
-RAG queries Chroma: semantic search "agentic design patterns"
-    ↓
-Combines results → injects into Claude Sonnet
-    ↓
-Claude synthesizes answer from retrieved context
-    ↓
-Output: Comprehensive answer with citations
+```text
+Incoming Knowledge
+   ↓
+GATHER
+Capture, normalize, classify, and preserve provenance
+   ↓
+RECONCILE
+Use the Cognitive Reconciliation Engine to compare against existing graph, memory, and architecture
+   ↓
+EVALUATE
+Use Disagreement-Driven Validation with Socratic critique
+   ↓
+PROMOTE
+Route to Obsidian, Neo4j, CTCR, backlog, INBOX, archive, or controlled execution
 ```
 
-**Status:** 🔲 Phase 3 (planned after validation + reconciliation)
+**Design Principle:** Agents are bounded cognitive workers with defined roles, explicit tools, constrained memory access, observable decisions, and human escalation paths. They are not unconstrained autonomous actors.
+
+#### 6a. Formal Capability Names
+
+| Concept | Formal Name | Role in PCA |
+|---|---|---|
+| Knowledge onboarding flow | **GREP** | End-to-end movement of candidate knowledge into governed memory or action |
+| Reconciliation capability | **Cognitive Reconciliation Engine** | Compares new knowledge against existing memory, detects relationships, contradictions, duplicates, and confidence changes |
+| Dueling-agent assurance pattern | **Disagreement-Driven Validation** | Uses proposal + challenge to convert disagreement into a governance signal |
+| Challenge style | **Socratic critique** | The critic tests assumptions, evidence, framing, omissions, contradictions, and promotion risk |
+
+#### 6b. Agent Role Model
+
+| Agent | Primary Role | GREP Stage | Core Outputs | Phase |
+|---|---|---|---|---|
+| **Capture / Gather Agent** | Normalize incoming content and preserve provenance | Gather | Structured candidate knowledge item | Phase 1 |
+| **Screening Agent** | Produce the primary validation proposal | Evaluate | Scores, rationale, routing proposal | Phase 1 |
+| **Socratic Critic Agent** | Challenge assumptions, evidence, fit, and premature promotion | Evaluate | Critique, disagreement signals, alternate scores | Phase 1 |
+| **Reconciliation Agent** | Compare candidate knowledge against existing memory | Reconcile | Reinforce / Contradict / Expand / Duplicate / Ignore proposal | Phase 2 |
+| **Promotion Controller** | Apply routing, policy, and write rules | Promote | PROMOTE / INBOX / ARCHIVE / CTCR / BACKLOG decision | Phase 2 |
+| **Retrieval Agent** | Build task-specific context windows | Gather / Reconcile | Source-grounded context pack | Phase 3-4 |
+| **Synthesis Agent** | Generate answers, briefs, summaries, and structured outputs | Evaluate / Promote | Draft answer, note, briefing, slide outline, document | Phase 4-5 |
+| **Planner Agent** | Decompose work into steps and route execution | Promote | Task plan, tool sequence, escalation points | Phase 4-5 |
+| **Execution Agent** | Trigger approved workflows and integrations | Promote | Workflow run, task creation, integration action | Phase 5 |
+| **Reflection Agent** | Evaluate outputs and identify improvement signals | Evaluate | Quality notes, correction candidates, learning signals | Phase 6-7 |
+| **Governance Agent** | Apply policy, sensitivity, audit, and routing controls | Cross-cutting | Allow / deny / sanitize / escalate decision | Cross-phase |
+
+#### 6c. Disagreement-Driven Validation
+
+Disagreement-Driven Validation is the PCA assurance pattern where one agent proposes, scores, or synthesizes, and a second agent performs a Socratic challenge. The system treats material disagreement as a governance signal that can trigger revision, reconciliation, INBOX routing, or human review.
+
+```text
+Primary Agent Proposal
+   ↓
+Socratic Critic Agent Challenge
+   ↓
+Dimension-Level Agreement Check
+   ↓
+Confidence Assignment
+   ↓
+Route: Accept / Revise / Reconcile / INBOX / Escalate
+```
+
+Disagreement is useful signal, not failure. It identifies uncertainty, ambiguity, missing context, weak evidence, policy risk, or architectural misfit.
+
+Reusable evaluation dimensions:
+
+- credibility
+- quality
+- relevance
+- alignment
+- novelty
+- duplication risk
+- contradiction risk
+- architectural fit
+- governance risk
+- promotion readiness
+
+#### 6d. Cognitive Reconciliation Engine in the Agent Layer
+
+The Cognitive Reconciliation Engine is the reconciliation capability used inside GREP. It determines how new knowledge relates to the existing PCA graph and whether it should strengthen, challenge, extend, duplicate, or bypass existing memory.
+
+| Relationship | Meaning | Typical Action |
+|---|---|---|
+| **Reinforce** | Supports an existing concept, claim, or decision | Increase confidence, add evidence link |
+| **Contradict** | Conflicts with existing knowledge or assumptions | Route to INBOX or human review |
+| **Expand** | Adds a new dimension, example, or adjacent concept | Link and enrich graph |
+| **Duplicate** | Repeats existing content or known claim | Merge, ignore, or add provenance only |
+| **Ignore** | Does not map to a useful PCA capability or memory need | Archive |
+
+#### 6e. Runtime Model
+
+Agents run through a controlled execution envelope:
+
+```text
+User Request / System Event
+   ↓
+Intent + Sensitivity Classification
+   ↓
+Runtime Policy Gate
+   ↓
+Attention-Based Routing
+   ↓
+GREP Stage Selection
+   ↓
+Agent Selection
+   ↓
+Retrieval + Tool Access
+   ↓
+Reasoning / Synthesis / Action Proposal
+   ↓
+Disagreement-Driven Validation or Cognitive Reconciliation Check
+   ↓
+Human Gate if required
+   ↓
+Execution / Output / Memory Write
+   ↓
+Telemetry + Audit Log
+```
+
+The Runtime Policy Gate determines what an agent is allowed to see, which model tier may be used, whether content must remain local, and whether the output requires human approval before execution or persistence.
+
+#### 6f. Model Routing
+
+| Route | Model / Runtime | Use Case | Constraint |
+|---|---|---|---|
+| **Sensitive / private** | Ollama + Qwen2.5 local | Personal memory, private notes, sensitive reasoning | No external API call |
+| **Fast / low-risk** | Claude Haiku or local 7B | Classification, extraction, quick routing, critique | Low cost, bounded scope |
+| **Complex synthesis** | Claude Sonnet | Architecture synthesis, executive writing, difficult reasoning | Use only after policy check |
+| **Deep local synthesis** | Qwen2.5-32B local | Private reconciliation, long-context local reasoning | Requires GPU capacity |
+| **Experimental / non-sensitive** | NVIDIA NIM, Open WebUI, LM Studio, other CTCR candidates | Model comparison and runtime evaluation | Sandbox only; no sensitive data |
+
+Routing dimensions:
+
+- sensitivity and privacy classification
+- task complexity
+- required latency
+- cost ceiling
+- confidence requirement
+- tool access required
+- whether memory write or external action is requested
+
+#### 6g. Tool and Memory Access
+
+Agents may access PCA memory through explicit tools only. Direct unrestricted memory access is not allowed.
+
+| Capability | Preferred Access Pattern | Candidate Technology |
+|---|---|---|
+| Human-readable source of truth | Read/write governed Markdown | Obsidian |
+| Relationship and claim graph | Query and update graph records | Neo4j |
+| Semantic similarity | Vector search over derived memory | ChromaDB / BGE-M3 |
+| Hybrid retrieval | Keyword + metadata + vector search | OpenSearch candidate |
+| Retrieval orchestration | Build grounded context packs | LlamaIndex candidate |
+| Browser capture | Controlled web extraction | Playwright |
+| Voice capture | Transcription pipeline | Whisper |
+| Workflow execution | Event and action orchestration | n8n |
+| Tool interoperability | Standardized context/tool access | MCP candidate |
+| Policy decision | Runtime allow / deny / sanitize | Open Policy Agent candidate |
+| Identity boundary | Role-aware access control | Keycloak / Azure AD |
+
+Memory writes must preserve provenance, source linkage, confidence score, routing decision, GREP stage, agent role, and whether a human reviewed the change.
+
+#### 6h. Cognitive Health and Observability
+
+Every significant agent run should emit telemetry:
+
+| Metric | Purpose |
+|---|---|
+| `grep_stage` | Identify Gather / Reconcile / Evaluate / Promote stage |
+| `agent_role` | Identify which agent executed |
+| `model_used` | Track runtime/model routing decisions |
+| `input_sensitivity` | Confirm policy-compliant routing |
+| `retrieval_sources` | Preserve grounding and provenance |
+| `confidence_score` | Support decision quality tracking |
+| `disagreement_score` | Identify unstable or ambiguous decisions |
+| `reconciliation_relationship` | Track Reinforce / Contradict / Expand / Duplicate / Ignore |
+| `routing_outcome` | PROMOTE / INBOX / ARCHIVE / CTCR / BACKLOG / ESCALATE / EXECUTE |
+| `human_review_required` | Track governance workload |
+| `memory_write` | Confirm whether durable knowledge changed |
+| `execution_action` | Track external side effects |
+
+Candidate observability technologies include Prometheus + Grafana for operational metrics and Langfuse-style tracing for LLM and prompt-level analysis.
+
+#### 6i. Agent Governance Rules
+
+1. Agents cannot silently promote candidate technologies into adopted architecture.
+2. Agents cannot write to canonical memory without provenance and routing metadata.
+3. Agents cannot execute external actions without policy-gate approval.
+4. Sensitive content routes local unless explicitly approved otherwise.
+5. High-disagreement outputs route to INBOX or human review.
+6. Reconciliation changes must distinguish evidence, inference, and decision.
+7. Runtime logs must support later audit, debugging, and learning.
+8. GREP promotion decisions must identify the destination: Obsidian, Neo4j, CTCR, backlog, INBOX, archive, or execution.
+9. Frontier techniques such as TurboQuant or per-layer embeddings remain strategic signals until proven reproducible and governable.
+
+#### 6j. Reference Agent Architecture
+
+```mermaid
+graph TD
+    REQUEST[User request or system event]
+    POLICY[Runtime Policy Gate]
+    ROUTER[Attention-Based Router]
+    GATHER[Gather Agent]
+    RECON[Cognitive Reconciliation Engine]
+    SCREEN[Screening Agent]
+    CRITIC[Socratic Critic Agent]
+    PROMOTE[Promotion Controller]
+    EXEC[Execution Agent]
+    HUMAN[Human Gate]
+    MEMORY[Obsidian / Neo4j / Chroma]
+    CTCR[Candidate Technology Registry]
+    OBS[Telemetry + Audit]
+
+    REQUEST --> POLICY
+    POLICY --> ROUTER
+    ROUTER --> GATHER
+    GATHER --> RECON
+    RECON --> MEMORY
+    MEMORY --> RECON
+    RECON --> SCREEN
+    SCREEN --> CRITIC
+    CRITIC --> PROMOTE
+    PROMOTE --> MEMORY
+    PROMOTE --> CTCR
+    PROMOTE --> EXEC
+    PROMOTE --> HUMAN
+    EXEC --> OBS
+    GATHER --> OBS
+    RECON --> OBS
+    SCREEN --> OBS
+    CRITIC --> OBS
+    PROMOTE --> OBS
+    HUMAN --> MEMORY
+```
+
+#### 6k. Status and Build Sequence
+
+| Build Step | Description | Dependency | Status |
+|---|---|---|---|
+| 1 | Screening Agent + Socratic Critic Agent | Sprint 5 validation workflow | ✅ Designed |
+| 2 | GREP metadata fields and agent run schema | Validation logs and Neo4j schema | 🔲 Planned |
+| 3 | Runtime Policy Gate MVP | Sensitivity classification and model routing rules | 🔲 Planned |
+| 4 | Cognitive Reconciliation Engine implementation | 50+ INBOX decisions and disagreement examples | 🔲 Phase 2 |
+| 5 | Promotion Controller | CTCR, backlog, INBOX, and memory-write routing rules | 🔲 Phase 2 |
+| 6 | Retrieval Agent | Obsidian → Neo4j → Chroma/OpenSearch indexing | 🔲 Phase 3-4 |
+| 7 | Synthesis Agent | Stable retrieval context packs | 🔲 Phase 4 |
+| 8 | Planner + Execution agents | n8n workflow library and policy gate | 🔲 Phase 5 |
+| 9 | Reflection Agent | Outcome measurement and feedback loop | 🔲 Phase 6-7 |
+
+**Status:** 🔲 Phase 4 target overall, with Phase 1 agent primitives already designed through the validation layer.
 
 ---
 
@@ -510,16 +723,19 @@ Home PC
 
 **Bias Detection & Mitigation**
 - Validate source credibility (filter misinformation)
-- Dual-agent disagreement flags potential bias
+- Disagreement-Driven Validation flags potential bias, weak evidence, and overconfidence
+- Socratic critique exposes assumptions before promotion
 - User manual review of INBOX items
 
 **Human-in-the-Loop Gates**
 - Borderline content (INBOX) requires human review
-- Agent disagreements escalate to user
+- Material disagreement escalates to user
+- Contradictions detected by the Cognitive Reconciliation Engine require explicit handling
 - User decisions train system (RLHF-Lite)
 
 **Auditability & Logging**
 - All decisions logged with reasoning
+- GREP stage and agent role captured for significant runs
 - Obsidian provides audit trail (timestamped, versioned)
 - Neo4j stores full provenance graph
 
@@ -541,8 +757,8 @@ Home PC
 
 3. n8n (Validation Layer)
    Screening Agent scores video (Claude Sonnet, T=0.3)
-   Critical Agent scores video (Claude Haiku, T=0.8)
-   Compares scores, determines confidence + per-dimension thresholds
+   Socratic Critic Agent challenges assessment (Claude Haiku, T=0.8)
+   Disagreement-Driven Validation compares scores and critique
    Routes to PROMOTE/INBOX/ARCHIVE
 
 4. n8n (Integration)
@@ -569,7 +785,7 @@ Home PC
 ```
 1. New VideoCapture scored as PROMOTE
 
-2. Reconciliation Engine (Phase 2)
+2. Cognitive Reconciliation Engine (Phase 2)
    Query Neo4j: "Similar concepts?"
    Find existing Concept: "Agentic Systems"
 
@@ -586,13 +802,33 @@ Home PC
    Suggest: "Time to synthesize research into major paper?"
 ```
 
+### Example 3: GREP Knowledge Onboarding
+
+```
+1. Gather
+   Capture candidate idea, source, metadata, and initial classification
+
+2. Reconcile
+   Cognitive Reconciliation Engine checks for reinforcement, contradiction, expansion, duplication, or irrelevance
+
+3. Evaluate
+   Screening Agent proposes scores and route
+   Socratic Critic Agent challenges fit, evidence, assumptions, and promotion risk
+   Disagreement-Driven Validation assigns confidence and review need
+
+4. Promote
+   Promotion Controller routes to Obsidian, Neo4j, CTCR, backlog, INBOX, archive, or controlled execution
+```
+
 ---
 
 ## Design Trade-offs
 
 | Decision | Pro | Con |
 |----------|-----|-----|
-| **Dual agents** | Interpretable uncertainty | Higher cost ($0.06 vs $0.02/item) |
+| **Disagreement-Driven Validation** | Interpretable uncertainty and governance signal | Higher cost and workflow complexity |
+| **Socratic critique** | Exposes assumptions and weak evidence | May increase INBOX volume if too strict |
+| **GREP onboarding flow** | Makes knowledge movement explicit and auditable | Requires metadata discipline |
 | **Obsidian + Neo4j + Chroma** | Best of each (human + machine + semantic) | More complex sync |
 | **Local processing** | Privacy, no latency | More compute needed locally |
 | **3-tier routing (PROMOTE/INBOX/ARCHIVE)** | Explicit human review | Manual effort required |
