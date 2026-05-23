@@ -1,200 +1,130 @@
-# React Profile App
+[![Header](https://capsule-render.vercel.app/api?type=waving&color=0:0d1f2d,50:1a3a4a,100:0d1f2d&height=280&section=header&text=Personal%20Cognitive%20Architecture&fontSize=42&fontColor=e0f2f1&animation=fadeIn&fontAlignY=38&desc=Capture%20•%20Reconcile%20•%20Activate%20•%20Local-first%20AI%20infrastructure&descSize=18&descAlignY=58)](https://github.com/jjuniper-dev/personal-cognitive-architecture)
 
-## Quick Start
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=20&duration=3000&pause=1000&color=4DB6AC&center=true&vCenter=true&multiline=false&repeat=true&width=650&lines=Orchestrator-worker+agent+patterns;Neo4j+knowledge+graph+%2B+Obsidian+vault;n8n+workflow+automation+%7C+local-first;34+use+cases+across+8+clusters;Sprint+5+dual-agent+validation+layer" alt="Typing SVG" />
+</p>
 
-```bash
-npm install
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-## ⚠️ Important: Database Scripts
-
-The Neo4j population scripts (`scripts/populate-graph.js` and `scripts/populate-markov-states.js`) write to the database and require:
-- `CONFIRM_NEO4J_WRITE=true` environment variable
-- A secure `NEO4J_PASSWORD` (not the default "password")
-
-These scripts will refuse to run without both conditions met.
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active%20Build-4DB6AC?style=flat&logoColor=white" />
+  <img src="https://img.shields.io/badge/Sprint-5-1a3a4a?style=flat" />
+  <img src="https://img.shields.io/badge/UCs-34%20mapped-4DB6AC?style=flat" />
+  <img src="https://img.shields.io/badge/License-Private-555?style=flat" />
+</p>
 
 ---
 
-# Personal Cognitive Architecture (PCA)
+## 🧠 What this is
 
-## One-Line Definition
+A cognitive operating system — not a note-taking app, not a chatbot wrapper. A designed system that captures knowledge from multiple modalities, evaluates it, reconciles it against existing understanding, and activates it through AI agents and automated workflows.
 
-A cognitive operating system that captures, evaluates, integrates, and activates knowledge to continuously improve human thinking and decision-making.
-
-## What It Is
-
-The PCA is **not** a note-taking system, chatbot interface, or productivity tool.
-
-It is a designed system that transforms human cognition into a structured, augmentable, and continuously improving architecture.
-
-The system actively evaluates and evolves knowledge through a Cognitive Reconciliation Engine that identifies reinforcement, contradictions, gaps, and novel contributions. It bridges personal knowledge management with enterprise AI transformation patterns.
-
-## Core Objectives
-
-- **Capture** inputs from multiple modalities (text, voice, web, video, documents)
-- **Evaluate** information quality, credibility, and relevance
-- **Integrate** knowledge into a structured knowledge graph (Obsidian)
-- **Reconcile** new information against existing knowledge with confidence updates
-- **Activate** knowledge to generate insights, drive decisions, and trigger actions
-- **Output** high-quality structured artifacts (presentations, documents, dashboards)
-- **Govern** critical decisions through human-in-the-loop validation
-- **Comply** with GC/HC standards and Responsible AI principles
-
-## Architectural Principles
-
-| Principle | Meaning |
-|-----------|---------|
-| **System over Tools** | Architecture and flow prioritized over individual tools |
-| **Human-in-the-Loop Governance** | Critical decisions and belief updates require human validation |
-| **Structured Knowledge First** | All information normalized before integration |
-| **Continuous Evolution** | System updates internal models over time |
-| **Separation of Concerns** | Capture, Processing, Storage, Reasoning, Output remain modular |
-| **Ethics by Design** | Privacy, bias detection, accountability embedded at each stage |
-
-## End-to-End Flow
-
-```
-[Capture]
-   ↓
-[Validation & Scoring]
-   ↓
-[Cognitive Reconciliation Engine]
-   ↓
-[Knowledge Graph (Obsidian)]
-   ↓
-[Reasoning / Agents]
-   ↓
-[Execution Layer]
-   ↓
-[Multi-Modal Output Generation]
-```
-
-Each stage is governed, modular, and reversible.
-
-## Key Capabilities
-
-- **Knowledge Management**: Structured ingestion, graph-based linking, semantic retrieval
-- **AI-Augmented Reasoning**: Pattern detection, cross-domain synthesis, insight generation
-- **Agent Orchestration**: Modular agents performing specific tasks via n8n automation
-- **Multi-Modal Processing**: Text, audio transcription, video summarization, web extraction
-- **Decision Support**: Prioritization, risk identification, strategic alignment
-- **Reconciliation**: Active contradiction detection and belief evolution
-- **Output Generation**: Multi-modal artifacts meeting GC/HC compliance standards
-
-## Current Phase
-
-### Phase 1: MVP (Cloud Jumpstart)
-
-**Objective**: Prove the first operational loop
-
-```
-n8n → Obsidian → structured note in vault
-```
-
-**Immediate Goals**:
-- Obsidian vault operational
-- VS Code workspace operational
-- n8n in Docker operational
-- One metadata-compliant note written to `/00 Inbox`
-- Ingestion workflow validated
-- Metadata integrity verified
-
-**Timeline**: Establish memory and plumbing layer first.
-
-### Phase 2: Self-Hosted Migration
-
-- Local inference
-- Self-hosted services
-- Semantic indexing
-- Structured session support
-- Full observability
-
-### Phase 3+: Enterprise Applicability
-
-- Formal Cognitive Reconciliation Engine implementation
-- GC/HC compliance integration
-- Multi-modal output standardization
-- Agent orchestration at scale
-
-## Key Differentiators
-
-1. **Cognitive Reconciliation** - Explicit handling of contradictions, model updates, and belief evolution
-2. **System-Level Thinking** - Designed like enterprise architecture for the mind
-3. **Not Passive Storage** - Actively evaluates and evolves knowledge
-4. **Multi-Modal Output Engine** - Produces artifacts, not just responses
-5. **Hybrid Personal + Enterprise** - Bridges personal cognition with enterprise patterns
-6. **Governed Autonomy** - Human oversight required for consequential decisions
-
-## Non-Negotiable Principles
-
-- **Obsidian is canonical** — Vector indexes support recall, never replace source memory
-- **Intake is not knowledge** — Unprocessed captures remain untrusted until validated
-- **Human oversight matters** — High-impact decisions require review or approval
-- **Governed not autonomous** — Reconciliation and synthesis are explicitly triggered
-- **Least-complex architecture** — Simple, durable components over unnecessary infrastructure
-- **Orchestrator-worker pattern** — Clear scope, routing, and escalation boundaries
-
-## Documentation Structure
-
-| Document | Purpose |
-|----------|---------|
-| **TECHNOLOGY_STACK.md** | Phase-based technology choices (Phase 1-3), architecture diagrams, component decisions |
-| **pca-north-star.md** | Vision, design position, and strategic direction |
-| **pca-intent-and-build-direction.md** | Current build phase and immediate objectives |
-| **pca-operating-model.md** | Governance, runtime rules, and escalation |
-| **pca-cognitive-reconciliation-engine.md** | Core differentiator logic and implementation |
-| **pca-compliance-and-governance.md** | GC/HC alignment, ethics, and standards |
-| **pca-active-priorities.md** | Current focus and execution order |
-| **pca-readiness-assessment.md** | State vs intent gap analysis |
-
-## Technology Stack
-
-### Personal Stack (Phase 1)
-- **Obsidian** — Knowledge graph and canonical memory
-- **n8n** — Workflow orchestration and automation
-- **VS Code** — Development and note editing
-- **LLMs** — OpenAI, Mistral (API-based initially)
-
-### Enterprise Alignment (Phase 3)
-- **Azure ecosystem** — Cloud infrastructure
-- **Microsoft Fabric** — Data and analytics platform
-- **Power Platform** — Low-code automation
-- **GC-compliant AI services** — Enterprise governance
-
-## Strategic Positioning
-
-This system represents the transition from:
-
-**AI as a tool** → **AI as cognitive infrastructure**
-
-It aligns with:
-- Personal Knowledge Management evolution
-- Agent-based system design patterns
-- Enterprise AI transformation practices
-- Responsible AI and GC policy frameworks
-
-## Getting Started
-
-1. Review **pca-north-star.md** for vision and principles
-2. Read **pca-intent-and-build-direction.md** for current phase
-3. Check **pca-active-priorities.md** for execution order
-4. See **docs/** directory for complete architecture documentation
-
-## Key Constraints (Phase 1)
-
-- ✗ No new infrastructure before ingestion loop works
-- ✗ No workers before orchestrator defined
-- ✗ No indexing before memory is clean
-- ✓ Priority: Memory and plumbing layer first
+Built local-first, self-hosted, privacy-by-design. The Ayla ecosystem.
 
 ---
 
-**Mantra**: Build memory and plumbing first.
+## 🏗️ Five-Layer Architecture
+
+| Layer | Purpose | Stack |
+|-------|---------|-------|
+| **L1** Knowledge & Control | Persistent memory, vault, graph | ![Neo4j](https://skillicons.dev/icons?i=neo4j) ![Obsidian](https://skillicons.dev/icons?i=obsidian) |
+| **L2** Agent Runtime | Orchestrator-worker pattern | ![Claude](https://img.shields.io/badge/Claude-Sonnet%20%2F%20Haiku-4DB6AC?style=flat) |
+| **L3** Workflow & Integration | Automation, webhooks, pipelines | ![n8n](https://skillicons.dev/icons?i=n8n) |
+| **L4** Infrastructure | Mesh networking, containers | ![Docker](https://skillicons.dev/icons?i=docker) ![Linux](https://skillicons.dev/icons?i=linux) |
+| **L5** AI Models | Cloud + local inference | ![Python](https://skillicons.dev/icons?i=python) |
+
+---
+
+## 🛠️ Stack
+
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=neo4j,docker,python,fastapi,git,github,obsidian,n8n,linux" />
+</p>
+
+| Component | Role | Status |
+|-----------|------|--------|
+| **n8n** (Docker) | Workflow orchestration — L3 | ✅ Live |
+| **Neo4j** (Docker) | Knowledge graph — L1 | ✅ Live |
+| **Obsidian** (`050926_vault`) | Canonical vault — L1 | ✅ Live |
+| **Tailscale** | Mesh network — L4 | ✅ Live |
+| **Claude Sonnet** `T=0.3` | Orchestrator agent — L2 | ✅ Active |
+| **Claude Haiku** `T=0.8` | Critical review agent — L2 | ✅ Active |
+| **OpenClaw** | L2 gateway (provisional) | 🟡 NanoClaw under eval |
+| **Whisper** | Transcription — L5 | 🟡 API interim / RTX 3090 planned |
+| **iOS capture pipeline** | Vault ingest — L3 | 🔴 Gating dependency |
+
+---
+
+## 📦 Repository Structure
+
+```
+personal-cognitive-architecture/
+├── src/
+│   └── capture-api/        # FastAPI capture layer (iOS → Neo4j → n8n)
+├── docs/
+│   ├── uc-profiles/        # 34 UC full profiles (trigger, flow, tools, deps)
+│   └── *.md                # Architecture, sprint docs, decision logs
+├── agents/                 # Agent definitions
+├── workflows/              # n8n workflow exports
+├── schemas/                # Neo4j and data schemas
+└── scripts/                # Utility scripts
+```
+
+---
+
+## 🗂️ Use Case Clusters
+
+<details>
+<summary>34 UCs across 8 clusters — click to expand</summary>
+
+| Cluster | UCs | Status |
+|---------|-----|--------|
+| 🧠 Personal Knowledge | UC 01–05 | 🟡 UC-01 in progress |
+| ⚙️ Automation | UC 06–10 | 🟡 UC-07 migrating Zapier→n8n |
+| 🎯 Lifestyle | UC 11–14 | 🔴 Not started |
+| 💰 Finance | UC 15–18 | 🔴 Blocked on UC-16 bank connectivity |
+| 🌐 Open Source | UC 19–22 | 🔴 Not started |
+| 🏛️ Enterprise Architecture | UC 23–28 | 🟡 UC-25 active |
+| 📊 Data & Platform Strategy | UC 29–31 | 🔴 Not started |
+| 📢 Knowledge Publishing | UC 32–34 | 🔴 Not started |
+
+Full profiles: [`docs/uc-profiles/`](./docs/uc-profiles/)
+
+</details>
+
+---
+
+## 🤖 Agent Pattern
+
+```
+[Ayla Orchestrator — Sonnet T=0.3]
+        │
+        ├──▶ [Worker: Knowledge Query — Haiku]
+        ├──▶ [Worker: Memory Recall — Haiku]
+        ├──▶ [Worker: Web Search — Haiku]
+        ├──▶ [Worker: Workflow Trigger]
+        └──▶ [Critical Review — Haiku T=0.8]
+```
+
+Workers are n8n sub-workflows exposed as tools — not autonomous agents.
+
+---
+
+## 🔴 Critical Path
+
+1. **iOS capture pipeline** → unblocks UC-01, 02, 03
+2. **UC-07 Zapier → n8n migration** → quick win
+3. **UC-16 bank connectivity decision** (SimpleFIN / Flinks / CSV) → unblocks Finance cluster
+4. **UC-01 stable** → unblocks UC-03, 04, 05
+5. **UC-06 Ayla routing layer** → unblocks Lifestyle + Automation clusters
+
+---
+
+## 📁 Related Repos
+
+| Repo | Purpose |
+|------|---------|
+| [`jjuniper-dev/Obsidian`](https://github.com/jjuniper-dev/Obsidian) | Vault reference — structure and templates only |
+| [`jjuniper-dev/status-site`](https://github.com/jjuniper-dev/status-site) | HC/PHAC AI Project Dashboard (PATH/HAIL tracking) |
+
+---
+
+[![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0d1f2d,50:1a3a4a,100:0d1f2d&height=120&section=footer)](https://github.com/jjuniper-dev/personal-cognitive-architecture)
