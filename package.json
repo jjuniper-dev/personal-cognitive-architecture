@@ -6,17 +6,22 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest",
     "populate-graph": "node scripts/populate-graph.js",
     "populate-markov": "node scripts/populate-markov-states.js"
   },
   "dependencies": {
+    "@octokit/rest": "^20.1.1",
+    "@trpc/server": "^10.45.2",
+    "dotenv": "^16.3.1",
+    "neo4j-driver": "^5.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "neo4j-driver": "^5.16.0",
-    "dotenv": "^16.3.1"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vitest": "^1.6.0"
   }
 }
