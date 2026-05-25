@@ -2,12 +2,14 @@ import { Octokit } from "@octokit/rest";
 
 /**
  * GitHub Connector for Obsidian Vault Integration
- * 
+ *
  * Provides read-only access to the Obsidian vault stored in GitHub
- * as a backup source for the cognitive architecture dashboard.
+ * as a synchronization and backup source for the cognitive architecture dashboard.
+ *
+ * Canonical authority remains the local-first Obsidian vault.
  */
 
-interface VaultNote {
+export interface VaultNote {
   path: string;
   name: string;
   content: string;
@@ -16,25 +18,25 @@ interface VaultNote {
   type: "concept" | "daily" | "project" | "research" | "output" | "reference" | "template";
 }
 
-interface VaultFolder {
+export interface VaultFolder {
   name: string;
   path: string;
   description: string;
   noteCount: number;
 }
 
-interface VaultMetadata {
+export interface VaultMetadata {
   totalNotes: number;
   totalFolders: number;
   lastSync: string;
   folders: VaultFolder[];
 }
 
-class GitHubVaultConnector {
+export class GitHubVaultConnector {
   private octokit: Octokit;
   private owner: string;
   private repo: string;
-  private branch: string = "main";
+  private branch = "main";
 
   constructor(githubToken: string, owner: string = "jjuniper-dev", repo: string = "Obsidian") {
     this.octokit = new Octokit({ auth: githubToken });
@@ -42,9 +44,6 @@ class GitHubVaultConnector {
     this.repo = repo;
   }
 
-  /**
-   * Get vault folder structure
-   */
   async getVaultStructure(): Promise<VaultFolder[]> {
     try {
       const { data } = await this.octokit.repos.getContent({
@@ -61,14 +60,12 @@ class GitHubVaultConnector {
       const folders: VaultFolder[] = [];
       const folderMap: Record<string, number> = {};
 
-      // Get all markdown files to count notes per folder
       const allFiles = await this.getAllMarkdownFiles();
       allFiles.forEach((file) => {
         const folderPath = file.path.split("/")[0];
         folderMap[folderPath] = (folderMap[folderPath] || 0) + 1;
       });
 
-      // Map folder descriptions
       const folderDescriptions: Record<string, string> = {
         "00_Inbox": "Temporary ingestion zone for new captures",
         "01_Daily": "Daily cognitive snapshots and reflections",
@@ -86,7 +83,6 @@ class GitHubVaultConnector {
         "90_Archive": "Archived and historical content",
       };
 
-      // Build folders list
       for (const item of data) {
         if (item.type === "dir" && !item.name.startsWith(".")) {
           folders.push({
@@ -109,9 +105,6 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * Get all markdown files in the vault
-   */
   private async getAllMarkdownFiles(path: string = ""): Promise<Array<{ path: string }>> {
     try {
       const { data } = await this.octokit.repos.getContent({
@@ -143,28 +136,32 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * Get a specific note from the vault
-   */
   async getNote(path: string): Promise<VaultNote | null> {
     try {
       const { data } = await this.octokit.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path: path,
+        path,
         ref: this.branch,
       });
 
-      if (typeof data === "string" || !Array.isArray(data) === false) {
+      if (typeof data === "string" || Array.isArray(data)) {
         return null;
       }
 
       const fileData = data as any;
+
       if (fileData.type !== "file" || !fileData.download_url) {
         return null;
       }
 
       const response = await fetch(fileData.download_url);
+
+      if (!response.ok) {
+        console.error(`[GitHub Connector] Failed to download note ${path}: ${response.status}`);
+        return null;
+      }
+
       const content = await response.text();
 
       const { frontmatter, body } = this.parseFrontmatter(content);
@@ -184,9 +181,6 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * List notes in a specific folder
-   */
   async listNotesInFolder(folderPath: string): Promise<VaultNote[]> {
     try {
       const { data } = await this.octokit.repos.getContent({
@@ -218,9 +212,6 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * Get vault metadata and statistics
-   */
   async getVaultMetadata(): Promise<VaultMetadata> {
     try {
       const folders = await this.getVaultStructure();
@@ -243,9 +234,6 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * Search notes by content or frontmatter
-   */
   async searchNotes(query: string): Promise<VaultNote[]> {
     try {
       const allFiles = await this.getAllMarkdownFiles();
@@ -273,9 +261,6 @@ class GitHubVaultConnector {
     }
   }
 
-  /**
-   * Parse YAML frontmatter from markdown content
-   */
   private parseFrontmatter(content: string): {
     frontmatter: Record<string, unknown> | null;
     body: string;
@@ -302,9 +287,6 @@ class GitHubVaultConnector {
     return { frontmatter, body };
   }
 
-  /**
-   * Infer note type from path
-   */
   private inferNoteType(
     path: string
   ): "concept" | "daily" | "project" | "research" | "output" | "reference" | "template" {
@@ -318,5 +300,3 @@ class GitHubVaultConnector {
     return "reference";
   }
 }
-
-export { GitHubVaultConnector, VaultNote, VaultFolder, VaultMetadata };
