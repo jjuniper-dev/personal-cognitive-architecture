@@ -2,236 +2,90 @@ import { z } from "zod";
 import { publicProcedure, router } from "./_core/trpc";
 import { GitHubVaultConnector } from "./github-connector";
 
-/**
- * Vault Router
- * 
- * Provides tRPC procedures for accessing the Obsidian vault via GitHub
- * as a backup source for the cognitive architecture dashboard.
- */
+const SAFE_PATH_REGEX = /^[a-zA-Z0-9_\-/.]+$/;
 
-// Initialize GitHub connector (requires GITHUB_TOKEN env var)
+const validatePath = (path: string) => {
+  if (
+    path.includes("..") ||
+    path.startsWith("/") ||
+    !SAFE_PATH_REGEX.test(path)
+  ) {
+    throw new Error("Invalid vault path");
+  }
+};
+
 const getVaultConnector = () => {
   const token = process.env.GITHUB_TOKEN;
+
   if (!token) {
     throw new Error("GITHUB_TOKEN environment variable not set");
   }
-  return new GitHubVaultConnector(token, "jjuniper-dev", "Obsidian");
+
+  return new GitHubVaultConnector(
+    token,
+    process.env.GITHUB_VAULT_OWNER || "jjuniper-dev",
+    process.env.GITHUB_VAULT_REPO || "Obsidian"
+  );
 };
 
 export const vaultRouter = router({
-  /**
-   * Get vault structure and folder listing
-   */
   structure: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const folders = await connector.getVaultStructure();
-      return {
-        success: true,
-        data: folders,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get structure:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve vault structure",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.getVaultStructure();
   }),
 
-  /**
-   * Get vault metadata and statistics
-   */
   metadata: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const metadata = await connector.getVaultMetadata();
-      return {
-        success: true,
-        data: metadata,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get metadata:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve vault metadata",
-        data: null,
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.getVaultMetadata();
   }),
 
-  /**
-   * List notes in a specific folder
-   */
   listNotes: publicProcedure
-    .input(z.object({ folderPath: z.string() }))
+    .input(z.object({ folderPath: z.string().min(1).max(200) }))
     .query(async ({ input }) => {
-      try {
-        const connector = getVaultConnector();
-        const notes = await connector.listNotesInFolder(input.folderPath);
-        return {
-          success: true,
-          data: notes,
-        };
-      } catch (error) {
-        console.error("[Vault Router] Failed to list notes:", error);
-        return {
-          success: false,
-          error: "Failed to retrieve notes",
-          data: [],
-        };
-      }
+      validatePath(input.folderPath);
+
+      const connector = getVaultConnector();
+      return connector.listNotesInFolder(input.folderPath);
     }),
 
-  /**
-   * Get a specific note by path
-   */
   getNote: publicProcedure
-    .input(z.object({ path: z.string() }))
+    .input(z.object({ path: z.string().min(1).max(500) }))
     .query(async ({ input }) => {
-      try {
-        const connector = getVaultConnector();
-        const note = await connector.getNote(input.path);
-        return {
-          success: true,
-          data: note,
-        };
-      } catch (error) {
-        console.error("[Vault Router] Failed to get note:", error);
-        return {
-          success: false,
-          error: "Failed to retrieve note",
-          data: null,
-        };
-      }
+      validatePath(input.path);
+
+      const connector = getVaultConnector();
+      return connector.getNote(input.path);
     }),
 
-  /**
-   * Search notes by query
-   */
   search: publicProcedure
-    .input(z.object({ query: z.string() }))
+    .input(z.object({ query: z.string().min(1).max(200) }))
     .query(async ({ input }) => {
-      try {
-        const connector = getVaultConnector();
-        const results = await connector.searchNotes(input.query);
-        return {
-          success: true,
-          data: results,
-        };
-      } catch (error) {
-        console.error("[Vault Router] Failed to search notes:", error);
-        return {
-          success: false,
-          error: "Failed to search notes",
-          data: [],
-        };
-      }
+      const connector = getVaultConnector();
+      return connector.searchNotes(input.query);
     }),
 
-  /**
-   * Get canonical notes (from 04_Concepts folder)
-   */
   getCanonicalNotes: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const notes = await connector.listNotesInFolder("04_Concepts");
-      return {
-        success: true,
-        data: notes,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get canonical notes:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve canonical notes",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.listNotesInFolder("04_Concepts");
   }),
 
-  /**
-   * Get inbox notes (from 00_Inbox folder)
-   */
   getInboxNotes: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const notes = await connector.listNotesInFolder("00_Inbox");
-      return {
-        success: true,
-        data: notes,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get inbox notes:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve inbox notes",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.listNotesInFolder("00_Inbox");
   }),
 
-  /**
-   * Get daily notes (from 01_Daily folder)
-   */
   getDailyNotes: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const notes = await connector.listNotesInFolder("01_Daily");
-      return {
-        success: true,
-        data: notes,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get daily notes:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve daily notes",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.listNotesInFolder("01_Daily");
   }),
 
-  /**
-   * Get research notes (from 03_Research folder)
-   */
   getResearchNotes: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const notes = await connector.listNotesInFolder("03_Research");
-      return {
-        success: true,
-        data: notes,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get research notes:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve research notes",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.listNotesInFolder("03_Research");
   }),
 
-  /**
-   * Get project notes (from 02_Projects folder)
-   */
   getProjectNotes: publicProcedure.query(async () => {
-    try {
-      const connector = getVaultConnector();
-      const notes = await connector.listNotesInFolder("02_Projects");
-      return {
-        success: true,
-        data: notes,
-      };
-    } catch (error) {
-      console.error("[Vault Router] Failed to get project notes:", error);
-      return {
-        success: false,
-        error: "Failed to retrieve project notes",
-        data: [],
-      };
-    }
+    const connector = getVaultConnector();
+    return connector.listNotesInFolder("02_Projects");
   }),
 });
