@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jjuniper-dev/personal-cognitive-architecture/schemas/canonical-metadata.schema.json",
+  "title": "PCA Canonical Metadata Schema",
+  "description": "Canonical metadata contract for knowledge objects within the Personal Cognitive Architecture.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "state",
+    "domain",
+    "sensitivity",
+    "created_at",
+    "updated_at",
+    "trace_id",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable globally unique identifier"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "note",
+        "capture",
+        "decision",
+        "meeting",
+        "artifact",
+        "workflow",
+        "architecture",
+        "research",
+        "task",
+        "reference",
+        "event",
+        "relationship",
+        "transcript",
+        "media",
+        "financial_record"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "captured",
+        "inbox",
+        "validated",
+        "provisional",
+        "reconciled",
+        "trusted",
+        "contested",
+        "archived",
+        "rejected",
+        "deleted",
+        "merged",
+        "superseded"
+      ]
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "work",
+        "mixed",
+        "system"
+      ]
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": [
+        "public",
+        "personal",
+        "internal",
+        "confidential",
+        "restricted"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "confidence_reasoning": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "not_required",
+        "pending",
+        "approved",
+        "rejected",
+        "deferred"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "related_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "voice_note",
+        "chat",
+        "youtube",
+        "podcast",
+        "web",
+        "manual",
+        "document",
+        "image",
+        "email",
+        "rss",
+        "finance",
+        "workflow",
+        "system"
+      ]
+    },
+    "source_uri": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string"
+    },
+    "policy_decision_id": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "captured_by",
+        "capture_timestamp"
+      ],
+      "properties": {
+        "captured_by": {
+          "type": "string"
+        },
+        "capture_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "original_source": {
+          "type": "string"
+        },
+        "source_credibility": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "transformation_history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target_id",
+          "relationship_type"
+        ],
+        "properties": {
+          "target_id": {
+            "type": "string"
+          },
+          "relationship_type": {
+            "type": "string",
+            "enum": [
+              "related_to",
+              "supports",
+              "contradicts",
+              "expands",
+              "derived_from",
+              "supersedes",
+              "references",
+              "duplicates",
+              "belongs_to"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "embedding": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "vector_id": {
+          "type": "string"
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "obsidian_path": {
+          "type": "string"
+        },
+        "neo4j_node_id": {
+          "type": "string"
+        },
+        "qdrant_collection": {
+          "type": "string"
+        },
+        "blob_uri": {
+          "type": "string"
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "requires_human_review": {
+          "type": "boolean"
+        },
+        "approved_for_external_use": {
+          "type": "boolean"
+        },
+        "retention_policy": {
+          "type": "string"
+        },
+        "deletion_approved": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
