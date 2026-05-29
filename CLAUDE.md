@@ -46,6 +46,8 @@ Use **Ayla** only for the assistant/persona/interface layer.
 
 If the component would still exist after renaming the assistant, it belongs to PCA.
 
+For the canonical knowledge metadata contract, see `docs/KNOWLEDGE_SCHEMA.md`.
+
 ---
 
 ## 2. Simplicity First
