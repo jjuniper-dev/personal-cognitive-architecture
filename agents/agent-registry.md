@@ -96,7 +96,9 @@ updated:
 | 4 | Write trusted knowledge |
 | 5 | High-impact execution; requires strong governance |
 
-## Core Agents
+## Core Agents (Design Registry)
+
+These are the formal design-layer agent definitions. For operational agents in the running system, see **Cross-Repository Agent Inventory** below.
 
 ### Ayla Orchestrator
 
@@ -244,6 +246,64 @@ Purpose:
 - emit alerts
 - produce operational summaries
 
+---
+
+## Cross-Repository Agent Inventory
+
+PCA agents span three repositories. This section maps all known agents and automation actors across the full system to eliminate blind spots in the registry.
+
+### pca repo agents (jjuniper-dev/pca)
+
+These are operational actors in the running system. See `pca/AGENTS.md` for the operational handbook (work dispatch, escalation, code agent capabilities).
+
+| Agent | Type | Interface | Status |
+|---|---|---|---|
+| James (operator) | Human / Product Owner | Cowork, phone | Active |
+| Cowork Claude | Orchestrator | Cowork desktop | Active |
+| Claude Code | Code agent | `start_code_task` dispatch | Active |
+| Codex | Code agent, PR-based | GitHub issues, `codex-task` label | Active |
+| WF09 / Qwen3-Coder | Code agent, isolated snippets | `POST /webhook/pca/code` | Active |
+| WF10 | Capture worker | `POST /webhook/pca/incident` | Active |
+| WF12 | Memory worker | `POST /webhook/pca/memory` | Active |
+| WF-Dispatch | Task dispatcher | `POST /webhook/pca/dispatch` | Active |
+| WF-Ayla | Ayla persona chatbot | `POST /webhook/pca/ayla` | Pending (E-Ayla.1) |
+
+### obsidian repo agents (jjuniper-dev/obsidian)
+
+These define vault-level governance for agent behavior when writing to the Obsidian vault. See `obsidian/_System/agents/`.
+
+| Agent | Type | Scope |
+|---|---|---|
+| Capture Agent | Vault write policy | What agents may write to Inbox |
+| Reconciliation Agent | Vault write policy | What agents may update during reconciliation |
+
+### Design → Implementation Mapping
+
+How the design-layer agents (Core Agents section above) map to running implementations:
+
+| Design Agent (this registry) | Operational Implementation (pca) | Gap |
+|---|---|---|
+| Ayla Orchestrator | Cowork Claude + WF-Ayla (pending E-Ayla.1) | WF-Ayla is Ollama-backed stepping stone; full Sonnet orchestrator is design target |
+| Knowledge Query Worker | WF12 (GET mode) | Live |
+| Memory Recall Worker | WF12 (GET mode, session context) | Live; session scoping is manual |
+| Critical Review Agent | Not yet implemented | E1.3.x (contradiction detection) is the prerequisite |
+| Capture Enrichment Worker | WF10 (partial — validation + auto-fill) | Full classification pending E4.1.1 |
+| Observability Monitor | WF13 (polling), pca_health_check.ps1 | Polling-based; not event-triggered on failure |
+
+### Capture Overlap Clarification
+
+Three components claim "capture" ownership across repos. They are **complementary, not conflicting**:
+
+| Component | Repo | What it actually is |
+|---|---|---|
+| WF10 | pca | **Running implementation** — validates and writes Obsidian + Qdrant + Neo4j |
+| `agents/capture-worker.md` | personal-cognitive-architecture | **Design specification** for the capture worker role that WF10 implements |
+| `_System/agents/capture-agent.md` | obsidian | **Vault write policy** — what any agent may and may not write to the vault |
+
+WF10 implements the capture-worker design and must comply with the capture-agent write policy.
+
+---
+
 ## Runtime Separation
 
 Agents should be separated by:
@@ -341,5 +401,6 @@ Avoid:
 | Runtime Policy Gate | Controls agent execution permissions |
 | Event Taxonomy | Defines agent execution events |
 | Reconciliation Engine | Reviewer agents participate in reconciliation |
-| Knowledge Lifecycle State Machine | Determines valid knowledge transitions |
+| Knowledge Lifecycle State Machine | `docs/KNOWLEDGE-LIFECYCLE.md` in this repo |
 | Observability Architecture | Tracks operational metrics and failures |
+| pca/AGENTS.md | Operational handbook: work dispatch and code agent procedures |
