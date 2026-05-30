@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Ingest Capture Contract",
-  "description": "Machine-readable contract for all inbound captures (articles, voice, signals, documents)",
+  "description": "Machine-readable contract for all inbound captures (articles, voice, signals, documents, images)",
   "type": "object",
   "required": [
     "capture_id",
@@ -28,6 +28,7 @@
         "document",
         "rss",
         "api",
+        "image",
         "structured-input"
       ],
       "description": "Classification of source modality"
@@ -69,6 +70,15 @@
           "type": "string",
           "enum": ["office", "home", "car", "other"],
           "description": "Capture location (voice notes)"
+        },
+        "mime_type": {
+          "type": "string",
+          "enum": ["image/jpeg", "image/png", "image/gif", "image/webp"],
+          "description": "MIME type for image captures (source_type: image)"
+        },
+        "file_hash": {
+          "type": "string",
+          "description": "SHA-256 hash of the original image data, used as idempotency key"
         }
       }
     },
@@ -79,11 +89,11 @@
     },
     "content": {
       "type": "object",
-      "description": "Captured content (varies by source type)",
+      "description": "Captured content (varies by source type; for images, raw_text holds AI-extracted summary)",
       "properties": {
         "raw_text": {
           "type": "string",
-          "description": "Raw content or transcription"
+          "description": "Raw content, transcription, or AI-extracted description"
         },
         "duration_seconds": {
           "type": "number",
@@ -97,6 +107,16 @@
           "type": "string",
           "default": "en",
           "description": "Detected language code"
+        },
+        "visual_analysis": {
+          "type": "object",
+          "description": "AI-extracted visual analysis (source_type: image only)",
+          "properties": {
+            "suggested_title": { "type": "string" },
+            "content_type": { "type": "string" },
+            "key_concepts": { "type": "array", "items": { "type": "string" } },
+            "tags": { "type": "array", "items": { "type": "string" } }
+          }
         }
       },
       "required": ["raw_text"]
@@ -167,16 +187,9 @@
       "items": {
         "type": "object",
         "properties": {
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "stage": {
-            "type": "string"
-          },
-          "note": {
-            "type": "string"
-          }
+          "timestamp": { "type": "string", "format": "date-time" },
+          "stage": { "type": "string" },
+          "note": { "type": "string" }
         }
       }
     }
@@ -226,6 +239,32 @@
       },
       "user_context": "PATH-HAIL project",
       "ingestion_policy": "policy-002"
+    },
+    {
+      "capture_id": "770a0611-g51d-63f6-c938-668877662222",
+      "source_type": "image",
+      "source_metadata": {
+        "mime_type": "image/png",
+        "file_hash": "sha256:abc123...",
+        "device": "iPhone 15 Pro"
+      },
+      "captured_at": "2026-05-30T10:00:00Z",
+      "content": {
+        "raw_text": "Architecture diagram showing the PCA user flow from capture through reconciliation to knowledge graph.",
+        "visual_analysis": {
+          "suggested_title": "pca-user-flow-architecture",
+          "content_type": "diagram",
+          "key_concepts": ["capture mesh", "reconciliation engine", "knowledge graph"],
+          "tags": ["pca", "architecture", "user-flow"]
+        }
+      },
+      "classification": "personal",
+      "processing_state": "classified",
+      "confidence": {
+        "transcription_confidence": 0.9
+      },
+      "user_context": "WF16 image capture",
+      "ingestion_policy": "policy-003"
     }
   ]
 }
