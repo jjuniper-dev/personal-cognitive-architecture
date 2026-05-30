@@ -121,7 +121,8 @@ Workers are n8n sub-workflows exposed as tools — not autonomous agents.
 ## 📁 Related Repos
 
 | Repo | Purpose |
-|------|---------|
+|------|--------|
+| [`jjuniper-dev/pca`](https://github.com/jjuniper-dev/pca) | Live operational workspace — active scripts, n8n workflows, BACKLOG, and task queue |
 | [`jjuniper-dev/Obsidian`](https://github.com/jjuniper-dev/Obsidian) | Vault reference — structure and templates only |
 | [`jjuniper-dev/status-site`](https://github.com/jjuniper-dev/status-site) | HC/PHAC AI Project Dashboard (PATH/HAIL tracking) |
 
