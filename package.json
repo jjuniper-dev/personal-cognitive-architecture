@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "populate-graph": "node scripts/populate-graph.js",
-    "populate-markov": "node scripts/populate-markov-states.js"
+    "populate-markov": "node scripts/populate-markov-states.js",
+    "repo-activity-check": "node scripts/repo-activity-check.js"
   },
   "dependencies": {
     "@octokit/rest": "^20.1.1",
