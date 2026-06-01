@@ -17,7 +17,7 @@
 
 A cognitive operating system — not a note-taking app, not a chatbot wrapper. A designed system that captures knowledge from multiple modalities, evaluates it, reconciles it against existing understanding, and activates it through AI agents and automated workflows.
 
-Built local-first, self-hosted, privacy-by-design. The Ayla ecosystem.
+Built local-first, self-hosted, privacy-by-design. Ayla is the user-facing assistant within the PCA system.
 
 ---
 
