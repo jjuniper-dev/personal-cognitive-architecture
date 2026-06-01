@@ -858,6 +858,8 @@ Home PC
 - **[SPRINT_5_QUICKSTART.md](SPRINT_5_QUICKSTART.md)** — Build validation layer (45 min)
 - **[SPRINT_5_VALIDATION_LAYER.md](SPRINT_5_VALIDATION_LAYER.md)** — Validation layer deep dive
 - **[ARCHITECTURAL_REVIEW_REQUEST_OPUS47.md](ARCHITECTURAL_REVIEW_REQUEST_OPUS47.md)** — Full architecture review for feedback
+- **[../../PCA/claude-knowledge-base-schema.md](../../PCA/claude-knowledge-base-schema.md)** — Claude orchestration knowledge-base schema
+- **[../../PCA/claude-kb/wiki/index.md](../../PCA/claude-kb/wiki/index.md)** — Canonical orchestration KB review surface
 
 ---
 

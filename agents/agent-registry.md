@@ -244,6 +244,217 @@ Purpose:
 - emit alerts
 - produce operational summaries
 
+## Workflow Stack Reconciliation
+
+The proposed workflow stack should be reconciled into the PCA registry by merging overlapping roles and adding only true capability gaps.
+
+### Proposed Workflow Mapping
+
+| Proposed Workflow Role | PCA-Aligned Disposition | Canonical PCA Role |
+|---|---|---|
+| Intake Agent | Merge and clarify | Capture Worker + Capture Enrichment Worker + Edge Policy Gate |
+| Backlog Agent | Add as new bounded worker | Backlog Draft Worker |
+| RAG Knowledge Agent | Merge | Knowledge Query Worker + Memory Recall Worker |
+| DevOps Coordinator | Add as new bounded worker | DevOps Coordination Worker |
+| Multi-Agent Research Team | Treat as orchestration pattern, not one agent | Research Orchestration Pattern |
+| Knowledge Lifecycle Agent | Add as new reviewer/worker pair or single bounded worker | Knowledge Lifecycle Worker |
+| Executive Briefing Agent | Add as new publisher | Executive Briefing Publisher |
+| Agent Supervisor | Merge | Ayla Orchestrator + Observability Monitor + Runtime Policy Gate |
+
+### Reconciliation Principles
+
+- Do not create a new agent when the role is already covered by an existing orchestrator, worker, or monitor.
+- Do not model governance layers such as the Runtime Policy Gate as free-standing autonomous agents.
+- Treat "teams" as orchestration patterns unless a single runtime identity is actually required.
+- Add new agents only when there is a distinct permission boundary, output target, or lifecycle responsibility.
+
+### Recommended PCA-Aligned Workflow Stack
+
+1. `Ayla Orchestrator`
+2. `Capture Worker`
+3. `Capture Enrichment Worker`
+4. `Backlog Draft Worker`
+5. `Knowledge Query Worker`
+6. `Memory Recall Worker`
+7. `Critical Review Agent`
+8. `Knowledge Lifecycle Worker`
+9. `Executive Briefing Publisher`
+10. `DevOps Coordination Worker`
+11. `Observability Monitor`
+
+This stack preserves PCA control-plane discipline while still covering the intent of the proposed eight workflow roles.
+
+## Added Canonical Agents for Current Gaps
+
+The following agents fill real gaps in the current registry and are appropriate additions.
+
+### Backlog Draft Worker
+
+```yaml
+agent_id: backlog-draft-worker
+agent_type: worker
+status: proposed
+runtime: Claude Haiku or local model
+execution_mode: semi-autonomous
+allowed_tools:
+  - backlog_schema_validation
+  - draft_generation
+  - obsidian_write
+  - review_queue_write
+allowed_output_targets:
+  - obsidian_inbox
+  - backlog_review_queue
+can_write_trusted_knowledge: false
+requires_human_approval: true
+max_autonomy_level: 2
+policy_profile: backlog-draft-worker
+```
+
+Purpose:
+
+- convert captures into draft backlog items
+- preserve acceptance criteria and suggested ownership
+- write only to draft or review destinations
+- never create GitHub issues or external tracker items without approval
+
+### DevOps Coordination Worker
+
+```yaml
+agent_id: devops-coordination-worker
+agent_type: worker
+status: proposed
+runtime: Claude Sonnet
+execution_mode: assisted
+allowed_tools:
+  - workflow_health
+  - incident_lookup
+  - config_diff
+  - runbook_query
+  - ci_status_query
+allowed_output_targets:
+  - ops_review_queue
+  - incident_notes
+  - remediation_plan
+can_write_trusted_knowledge: false
+requires_human_approval: true
+max_autonomy_level: 2
+policy_profile: devops-worker
+```
+
+Purpose:
+
+- coordinate infrastructure and workflow remediation
+- assemble operational context for failures
+- propose runbook actions and recovery sequences
+- avoid direct destructive infrastructure changes without approval
+
+### Knowledge Lifecycle Worker
+
+```yaml
+agent_id: knowledge-lifecycle-worker
+agent_type: worker
+status: proposed
+runtime: Claude Haiku
+execution_mode: semi-autonomous
+allowed_tools:
+  - metadata_review
+  - relationship_lookup
+  - reconciliation_trigger
+  - archive_candidate_generation
+allowed_output_targets:
+  - lifecycle_review_queue
+  - provisional_knowledge_updates
+can_write_trusted_knowledge: false
+requires_human_approval: true
+max_autonomy_level: 2
+policy_profile: lifecycle-worker
+```
+
+Purpose:
+
+- manage candidate promotion, challenge, stale marking, and archive proposals
+- prepare lifecycle transitions for governed review
+- trigger reconciliation when lifecycle state depends on contradiction analysis
+
+### Executive Briefing Publisher
+
+```yaml
+agent_id: executive-briefing-publisher
+agent_type: publisher
+status: proposed
+runtime: Claude Sonnet
+execution_mode: assisted
+allowed_tools:
+  - memory_query
+  - briefing_template
+  - citation_builder
+  - output_review
+allowed_output_targets:
+  - briefing_drafts
+  - obsidian_reports
+can_write_trusted_knowledge: false
+requires_human_approval: true
+max_autonomy_level: 1
+policy_profile: publisher-agent
+```
+
+Purpose:
+
+- generate executive-ready summaries from governed source material
+- preserve provenance and uncertainty
+- publish drafts only, not final external communications
+
+## Roles Not Added as New Agents
+
+These proposed roles should not be added as independent runtime identities.
+
+### Intake Agent
+
+Use existing PCA roles:
+
+- `Capture Worker` for intake and normalization
+- `Capture Enrichment Worker` for classification and metadata extraction
+- `Edge Policy Gate` for deterministic route control
+
+Reason:
+
+- intake is a pipeline segment, not one autonomous agent
+
+### RAG Knowledge Agent
+
+Use existing PCA roles:
+
+- `Knowledge Query Worker`
+- `Memory Recall Worker`
+
+Reason:
+
+- retrieval and recall are already separated appropriately by purpose
+
+### Multi-Agent Research Team
+
+Treat as:
+
+- orchestrated workflow pattern under `Ayla Orchestrator`
+- optionally composed from retrieval, review, and publishing agents
+
+Reason:
+
+- this is a coordination pattern, not a single permission boundary
+
+### Agent Supervisor
+
+Use existing PCA roles:
+
+- `Ayla Orchestrator`
+- `Observability Monitor`
+- `Runtime Policy Gate`
+
+Reason:
+
+- supervision is already distributed across orchestration, observability, and governance
+- introducing a separate supervisor agent would duplicate control-plane authority
+
 ## Runtime Separation
 
 Agents should be separated by:
