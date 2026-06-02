@@ -1,4 +1,4 @@
-[![Header](https://capsule-render.vercel.app/api?type=waving&color=0:0d1f2d,50:1a3a4a,100:0d1f2d&height=280&section=header&text=Personal%20Cognitive%20Architecture&fontSize=42&fontColor=e0f2f1&animation=fadeIn&fontAlignY=38&desc=Capture%20•%20Reconcile%20•%20Activate%20•%20Local-first%20AI%20infrastructure&descSize=18&descAlignY=58)](https://github.com/jjuniper-dev/personal-cognitive-architecture)
+[![Header](https://capsule-render.vercel.app/api?type=waving&color=0:0d1f2d,50:1a3a4a,100:0d1f2d&height=280&section=header&text=Personal%20Cognitive%20Architecture&fontSize=42&fontColor=e0f2f1&animation=fadeIn&fontAlignY=38&desc=Capture%20%E2%80%A2%20Reconcile%20%E2%80%A2%20Activate%20%E2%80%A2%20Local-first%20AI%20infrastructure&descSize=18&descAlignY=58)](https://github.com/jjuniper-dev/personal-cognitive-architecture)
 
 <p align="center">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=20&duration=3000&pause=1000&color=4DB6AC&center=true&vCenter=true&multiline=false&repeat=true&width=650&lines=Orchestrator-worker+agent+patterns;Neo4j+knowledge+graph+%2B+Obsidian+vault;n8n+workflow+automation+%7C+local-first;34+use+cases+across+8+clusters;Sprint+5+dual-agent+validation+layer" alt="Typing SVG" />
@@ -121,7 +121,8 @@ Workers are n8n sub-workflows exposed as tools — not autonomous agents.
 ## 📁 Related Repos
 
 | Repo | Purpose |
-|------|---------|
+|------|--------|
+| [`jjuniper-dev/pca`](https://github.com/jjuniper-dev/pca) | Live operational workspace — active scripts, n8n workflows, BACKLOG, and task queue |
 | [`jjuniper-dev/Obsidian`](https://github.com/jjuniper-dev/Obsidian) | Vault reference — structure and templates only |
 | [`jjuniper-dev/status-site`](https://github.com/jjuniper-dev/status-site) | HC/PHAC AI Project Dashboard (PATH/HAIL tracking) |
 
