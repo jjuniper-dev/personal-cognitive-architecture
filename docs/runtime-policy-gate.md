@@ -1,7 +1,7 @@
 ---
 type: architecture
 created: 2026-05-11
-updated: 2026-05-11
+updated: 2026-06-01
 tags: [pca, governance, runtime, policy, orchestration, security]
 status: draft
 ---
@@ -39,6 +39,28 @@ The PCA does not treat:
 as automatically trusted.
 
 All consequential operations must pass through a governed runtime boundary.
+
+---
+
+# 1.1 Gate Hierarchy
+
+The Runtime Policy Gate is the canonical PCA governance model.
+
+Specialized gates may exist for particular execution paths, but they inherit from this model rather than replacing it.
+
+Current specialization:
+
+- `Edge Policy Gate`: governs phone-originated capture events after local inference and before downstream routing
+
+The relationship is:
+
+```text
+Runtime Policy Gate
+└── Edge Policy Gate
+    └── capture -> validate -> govern -> route
+```
+
+The edge gate is therefore a scoped implementation of runtime governance for intake, not a separate architecture.
 
 ---
 
@@ -217,6 +239,32 @@ The Runtime Policy Gate may:
 | Sandbox | execute in isolated mode |
 | Log Only | permit but audit heavily |
 | Hold | defer until conditions improve |
+
+For implementation consistency, specialized gates should map their decisions back to this shared vocabulary even when they expose narrower routing semantics such as `review_queue` or `local_only`.
+
+---
+
+# 5.1 Shared Decision Record
+
+All policy gate implementations should emit a decision record with a stable minimum shape:
+
+```json
+{
+  "decision": "allow|deny|escalate|sandbox|hold|log_only",
+  "reason": "short_policy_reason",
+  "route": "obsidian|backlog|review_queue|local_only|discard|null",
+  "requires_human_approval": true,
+  "policy_version": "string",
+  "trace_id": "string"
+}
+```
+
+Notes:
+
+- `decision` is the canonical governance outcome
+- `route` is the execution-path selection when routing is relevant
+- `requires_human_approval` may be true even when the immediate decision is `hold` or `escalate`
+- capture-specific gates may add fields, but should not omit these baseline outputs
 
 ---
 

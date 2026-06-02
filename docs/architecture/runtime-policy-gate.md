@@ -8,6 +8,25 @@ It exists to prevent agent sprawl, uncontrolled data access, accidental disclosu
 
 The Runtime Policy Gate is the PCA equivalent of an enterprise AI control plane.
 
+## Gate Hierarchy
+
+This is the canonical governance model for PCA execution.
+
+Specialized gates can exist for narrower flows, but they inherit from this policy model.
+
+Current specialization:
+
+- `Edge Policy Gate` for phone-originated capture events after local inference and before routing
+
+That relationship is:
+
+```text
+Runtime Policy Gate
+└── Edge Policy Gate
+```
+
+The edge gate is therefore a scoped intake implementation, not a different control-plane concept.
+
 ## Scope
 
 The gate applies to:
@@ -103,6 +122,8 @@ The request is paused until the user explicitly approves.
 
 The request can execute only in a constrained environment with no durable writes.
 
+Specialized gates may expose narrower routing results such as `review_queue` or `local_only`, but those should still map back to these canonical execution outcomes.
+
 ## Policy Domains
 
 ### Personal Domain
@@ -149,6 +170,16 @@ decision:
 reason:
 policy_version:
 human_approval_id:
+```
+
+Minimum shared decision shape:
+
+```yaml
+decision: allow | deny | require_approval | sandbox | hold
+reason: short_policy_reason
+route: obsidian | backlog | review_queue | local_only | discard | null
+policy_version: string
+trace_id: correlation id
 ```
 
 ## Implementation Targets

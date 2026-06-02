@@ -622,6 +622,26 @@ Step 5: AUDIT LOG
 
 ---
 
+## Operational Dashboard
+
+The control plane is surfaced at runtime via a browser-based dashboard (`pca/dashboard/index.html`) served by the n8n nginx proxy at `localhost:5678`. It is the primary human interface to the control plane — not a reporting layer, but an active control surface.
+
+**Current capabilities:**
+- Live service health (n8n, Qdrant, Neo4j, Vault, Ollama) with one-click workflow toggle
+- Execution stream — last 25 n8n executions across all workflows in real time
+- Knowledge graph visualisation (Cytoscape.js) with dataset switching: Ops, AI Stack, Knowledge, ISO 22989, GC BCM, HC/PHAC, Full
+- Backlog panel (reads `BACKLOG.md` directly) and Kanban overlay
+- Dev agent panel (WF09 delegation history)
+- Knowledge store stats (Qdrant vector counts, Neo4j node counts)
+- Dispatch bar — accepts task IDs, `list`, `next`, or freeform prompts routed to WF-Dispatch
+
+**Ambient media layer (Webamp):**  
+The dashboard embeds [Webamp](https://webamp.org) — a browser-native Winamp 2 clone with MilkDrop visualizer (butterchurn). It is an ambient context layer, not infrastructure. Audio files are loaded via drag-and-drop. The now-playing state is available via the Webamp Redux store and is a candidate for WF10 activity capture (listening history → Neo4j).
+
+**Implementation repo:** `jjuniper-dev/pca`, branch `feature/dashboard-winamp` (PR pending to master).
+
+---
+
 ## Implementation Checklist
 
 ### Phase 1a
