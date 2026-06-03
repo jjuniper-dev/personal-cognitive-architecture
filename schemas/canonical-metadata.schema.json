@@ -60,7 +60,7 @@
         "archived",
         "tension"
       ],
-      "description": "WF10 capture status: raw (default), validated, reconciled, stale, archived, or tension (contradiction detected)"
+      "description": "WF10 capture status: raw (default), validated, reconciled, stale, archived, or tension (contradiction detected). This is the canonical lifecycle field — WF10 always populates this."
     },
     "state": {
       "type": "string",
@@ -78,7 +78,7 @@
         "merged",
         "superseded"
       ],
-      "description": "Broader governance state (alternative to status); used for enterprise-level workflows"
+      "description": "Reserved for a future governance layer. WF10 populates `status` only — do not populate `state` until this field is explicitly activated in the governance spec."
     },
     "source": {
       "type": "string",
@@ -135,7 +135,7 @@
         "confidential",
         "restricted"
       ],
-      "description": "WF10 data classification level"
+      "description": "WF10 data classification level. This is the canonical routing field — WF10 always populates this. Drives model tier selection: restricted = local only, confidential = Haiku/local only."
     },
     "sensitivity": {
       "type": "string",
@@ -146,7 +146,7 @@
         "confidential",
         "restricted"
       ],
-      "description": "Broader sensitivity classification (enterprise model)"
+      "description": "Reserved for a future personal/work domain split. WF10 populates `classification` only — do not populate `sensitivity` until this field is explicitly activated in the governance spec."
     },
     "confidence": {
       "type": "number",
