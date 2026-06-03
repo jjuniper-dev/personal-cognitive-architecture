@@ -10,11 +10,14 @@ Before touching any file in this repo, read in this order.
 4. `docs/REPO-AUTHORITY.md` — what this repo owns vs what `pca` owns
 5. `docs/ARCHITECTURE.md` — canonical 5-layer design model + 9-layer functional decomposition
 6. Relevant `schemas/`, `agents/`, or `docs/uc-profiles/` for the task
+7. `docs/repo-audit/` — latest root alignment review (check the newest file before making structural changes to either repo)
 
 ## For cross-repo work
 
 See `pca/GROUNDING.md` — the operational repo is the execution entry point.
 Active task queue lives in `pca/BACKLOG.md`.
+
+For cross-repo work involving Codex agents, also read `pca/CODEX.md`.
 
 ## Naming rule
 
