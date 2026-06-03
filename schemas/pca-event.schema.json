@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/jjuniper-dev/personal-cognitive-architecture/schemas/pca-event.schema.json",
+  "title": "PCA Event",
+  "description": "Canonical event envelope for all PCA system events. Every workflow, agent, or tool that emits a durable action should produce an event conforming to this schema.",
+  "type": "object",
+  "required": ["event_id", "event_class", "event_type", "source", "timestamp", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Unique event identifier. Recommended format: evt_<sha256-prefix-16>",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "examples": ["evt_3f7a2b9c1d4e5f60"]
+    },
+    "event_class": {
+      "type": "string",
+      "description": "Top-level taxonomy class — one of seven canonical classes.",
+      "enum": ["capture", "classify", "reconcile", "retrieve", "execute", "alert", "audit"]
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Specific event type within the class. Format: <class>.<subtype>",
+      "examples": [
+        "capture.voice", "capture.image", "capture.text", "capture.url", "capture.file",
+        "classify.auto", "classify.manual", "classify.override",
+        "reconcile.contradiction", "reconcile.merge", "reconcile.stale",
+        "retrieve.semantic", "retrieve.graph", "retrieve.hybrid",
+        "execute.workflow", "execute.agent", "execute.tool",
+        "alert.threshold", "alert.failure", "alert.approval-required",
+        "audit.access", "audit.publish", "audit.approval", "audit.lifecycle"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Originating component ID — workflow name, agent ID, or script name.",
+      "examples": ["WF10", "WF12", "WF15", "WF-Dispatch", "WF-Docker", "deploy.ps1", "session-hook"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of when the event was emitted."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Claude Code or agent session ID. Used for session-level traceability. Optional."
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Links related events in a processing chain (e.g. capture → classify → store share the same correlation_id). Optional."
+    },
+    "actor": {
+      "type": "object",
+      "description": "The component that generated this event.",
+      "required": ["type", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["workflow", "agent", "worker", "tool", "human"],
+          "description": "Actor role — see AGENTS.md for role definitions."
+        },
+        "id": {
+          "type": "string",
+          "description": "Workflow ID, agent name, or human identifier.",
+          "examples": ["b09dH4fUAWHYCPmt", "WF10", "james"]
+        },
+        "model": {
+          "type": "string",
+          "description": "LLM model used during this event, if any.",
+          "examples": ["gemma4:e4b", "llama3.2:3b", "claude-haiku-4-5", "claude-sonnet-4-6"]
+        }
+      }
+    },
+    "knowledge_lifecycle": {
+      "type": "string",
+      "description": "Lifecycle state of the knowledge object at the time of this event. Follows the canonical state machine: raw → validated → reconciled → stale → archived.",
+      "enum": ["raw", "validated", "reconciled", "stale", "archived"]
+    },
+    "classification": {
+      "type": "string",
+      "description": "Data sensitivity at time of event. Drives routing decisions — restricted blocks all cloud calls.",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "default": "internal"
+    },
+    "routing": {
+      "type": "object",
+      "description": "Routing decisions made for this event — which model tier, whether approval was required.",
+      "additionalProperties": false,
+      "properties": {
+        "model_tier": {
+          "type": "string",
+          "enum": ["local", "cloud-economy", "cloud-standard", "cloud-premium"],
+          "description": "Highest cost tier used. local = Ollama only."
+        },
+        "model_id": {
+          "type": "string",
+          "description": "Specific model invoked.",
+          "examples": ["gemma4:e4b", "claude-haiku-4-5-20251001", "claude-sonnet-4-6"]
+        },
+        "approval_required": {
+          "type": "boolean",
+          "description": "Whether a human approval gate was triggered."
+        },
+        "approval_gate": {
+          "type": "string",
+          "description": "Name of the approval gate triggered, if any.",
+          "examples": ["publish-gate", "cloud-call-gate", "consequential-action-gate"]
+        },
+        "approved": {
+          "type": "boolean",
+          "description": "Outcome of the approval gate. Absent if approval_required is false."
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific data. Shape varies by event_class and event_type. Must contain at least one property. See pca-event-backbone.md for per-class payload contracts.",
+      "minProperties": 1
+    },
+    "outcome": {
+      "type": "object",
+      "description": "Result of processing — populated after the event is handled.",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "failure", "partial", "skipped", "pending"]
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if status is failure or partial."
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Processing time in milliseconds."
+        },
+        "tokens_in": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Input tokens consumed by any model call."
+        },
+        "tokens_out": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Output tokens produced by any model call."
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "IDs or paths of durable artifacts produced (notes, embeddings, graph nodes).",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free-form tags for filtering and retrieval.",
+      "items": {"type": "string"},
+      "examples": [["voice", "wf15"], ["contradiction", "wf10"], ["deploy", "smoke-test"]]
+    }
+  },
+  "examples": [
+    {
+      "event_id": "evt_3f7a2b9c1d4e5f60",
+      "event_class": "capture",
+      "event_type": "capture.voice",
+      "source": "WF15",
+      "timestamp": "2026-06-03T18:00:00Z",
+      "correlation_id": "corr_voice_session_001",
+      "actor": {"type": "workflow", "id": "WF15"},
+      "knowledge_lifecycle": "raw",
+      "classification": "internal",
+      "routing": {"model_tier": "local", "model_id": "whisper-1"},
+      "payload": {
+        "input_hash": "3f7a2b9c",
+        "mime_type": "audio/wav",
+        "source": "iphone",
+        "transcription": "Note to self: review the event schema before sprint review."
+      },
+      "outcome": {
+        "status": "success",
+        "duration_ms": 1240,
+        "artifacts": ["00_Inbox/Voice-2026-06-03-3f7a2b9c.md"]
+      },
+      "tags": ["voice", "wf15"]
+    },
+    {
+      "event_id": "evt_9a1b2c3d4e5f6071",
+      "event_class": "reconcile",
+      "event_type": "reconcile.contradiction",
+      "source": "WF10",
+      "timestamp": "2026-06-03T18:05:00Z",
+      "actor": {"type": "workflow", "id": "WF10", "model": "llama3.2:3b"},
+      "knowledge_lifecycle": "validated",
+      "classification": "internal",
+      "routing": {"model_tier": "local", "model_id": "llama3.2:3b"},
+      "payload": {
+        "note_id": "note_abc",
+        "conflict_with": ["note_xyz"],
+        "similarity_score": 0.91,
+        "contradiction_reason": "Conflicting claim about Vault unseal procedure."
+      },
+      "outcome": {
+        "status": "success",
+        "duration_ms": 3200,
+        "artifacts": ["neo4j:CONTRADICTS(note_abc, note_xyz)"]
+      },
+      "tags": ["contradiction", "wf10"]
+    }
+  ]
+}
