@@ -1,146 +1,231 @@
 # Work Routing & Evaluation Protocol
 
-**Version**: 1.0  
-**Created**: 2026-06-04  
-**Owner**: PCA Orchestrator  
-**Layer**: L2 Agent Runtime + L3 Workflow & Integration
+**Status:** active  
+**Version:** 1.0  
+**Created:** 2026-06-04  
+**Owner:** PCA Runtime (L2/L3)  
+**Epic:** PCA-WRE-001
 
 ---
 
 ## Purpose
 
-Defines the complete loop for delegating bounded work to a bot, evaluating its output against explicit success criteria, and delivering an executive digest to the product owner for the Monday strategy session.
+This protocol closes the bot delegation loop in PCA. It defines:
+- how work packages are formatted and routed to bots
+- how bots report completed work
+- how the evaluator maps outcomes to GO / NEEDS-REVISION / NO-GO
+- how eval results are stored and surfaced to the product owner
 
 ---
 
-## The Loop
+## Work Package Format
+
+See `templates/work-package.json` for the canonical template.
+
+A work package has two sections:
+
+### `work_package` — assigned by the product owner before delegation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `work_package_id` | string | Unique ID — e.g., `WP-E6.2.1-001` |
+| `title` | string | Short human-readable label |
+| `goal` | string | One sentence: what the bot must accomplish |
+| `success_criteria` | array | List of verifiable outcomes (see below) |
+| `assigned_bot` | string | `claude-code`, `wf09`, `codex` |
+| `sprint` | string | Sprint label from the active campaign |
+
+Each success criterion:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | `SC-1`, `SC-2`, … |
+| `description` | string | Specific, observable outcome |
+| `verifiable_by` | enum | `automated-check`, `code-inspection`, `human-review` |
+
+**Writing good criteria:** A criterion is good when a reviewer can say PASS or FAIL from the `bot_output` alone without running the code. Prefer outcomes over actions ("webhook returns 200" not "deploy the script").
+
+### `bot_output` — submitted by the bot when work is complete
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `summary` | string | One paragraph describing what was done |
+| `deliverables` | string[] | Files, scripts, or artifacts produced |
+| `tests_passed` | boolean | Whether automated tests passed |
+| `verification_notes` | string | How the bot verified its own work |
+
+---
+
+## Delegation Flow
 
 ```
-Product Owner
-    |
-    | 1. Fill out work package (templates/work-package.json)
-    |
-    v
-Bot Assignment
-    |
-    | 2. Route work package to assigned bot (Claude Code, WF09, Codex)
-    | 3. Bot executes, records output
-    |
-    v
-POST /webhook/pca/eval
-    |  { work_package: {...}, bot_output: {...} }
-    |
-    v
-Work Routing Evaluator (Claude Opus 4.8)
-    |
-    | 4. Maps each success criterion -> PASS / PARTIAL / FAIL
-    | 5. Makes GO / NEEDS-REVISION / NO-GO decision
-    | 6. Writes eval note to Obsidian /PCA/Evals/
-    | 7. Posts to WF10 (knowledge capture)
-    | 8. Sends ntfy notification (if NTFY_URL configured)
-    |
-    v
-Weekly Aggregation (Monday 08:00)
-    |
-    | 9. WF-MondayDigest scans /PCA/Evals/ (past 7 days)
-    | 10. Synthesizes exec digest via Claude Opus 4.8
-    | 11. Writes /PCA/Digests/{date}-monday-digest.md
-    | 12. Sends ntfy + posts to WF10
-    |
-    v
-Product Owner - Monday Strategy Session
+Product owner writes work package
+  ↓
+Assigns to bot (claude-code / wf09 / codex)
+  ↓
+Bot executes the work
+  ↓
+Bot POSTs {work_package, bot_output} to /webhook/pca/eval
+  ↓
+Evaluator (WF-Eval) maps each SC → PASS/PARTIAL/FAIL
+  ↓
+Aggregates to overall_decision: GO | NEEDS-REVISION | NO-GO
+  ↓
+Writes eval note to Obsidian /PCA/Evals/
+Posts WF10 incident
+Sends ntfy notification (if NTFY_URL set)
+  ↓
+Product owner reviews at Monday strategy session (WF-MondayDigest)
 ```
 
 ---
 
-## Work Package Fields
+## Evaluation Webhook
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `work_package_id` | Yes | Unique ID (e.g. WP-2026-001) |
-| `title` | Yes | Short title (< 60 chars) |
-| `goal` | Yes | One sentence: what must be true when done |
-| `context` | No | Relevant background for the bot |
-| `inputs.files` | No | Files the bot needs |
-| `inputs.references` | No | URLs, docs, related work |
-| `inputs.constraints` | No | Hard limits (time, scope, style) |
-| `success_criteria` | Yes | At least 1 criterion with verifiable_by |
-| `assigned_bot` | Yes | `claude-code`, `wf09`, or `codex` |
-| `target_repo` | No | GitHub repo if applicable |
-| `target_branch` | No | Branch for the bot to work on |
-| `callback_webhook` | Yes | URL to POST result to (default: /webhook/pca/eval) |
-| `deadline_iso` | No | ISO 8601 datetime |
-| `sprint` | Yes | Sprint letter (A / C / D) |
-| `owner` | Yes | Who requested this (default: product-owner) |
-| `created_at` | Yes | ISO 8601 datetime |
+**Endpoint:** `POST /webhook/pca/eval`  
+**Blocking:** Yes — returns eval JSON when complete (up to 60 s)  
+**Deploy:** `. "C:\Users\client\Documents\PCA\create_wf_work_routing_eval.ps1"`
 
----
-
-## Bot Output Format
-
-When a bot completes a work package, it POSTs to `callback_webhook`:
-
+### Request
 ```json
 {
-  "work_package": { /* original work package */ },
-  "bot_output": {
-    "summary": "One paragraph: what was done, what was not done",
-    "deliverables": ["file path or PR URL"],
-    "pr_url": "https://github.com/...",
-    "tests_passed": true,
-    "verification_notes": "How verification was performed or why skipped"
-  }
+  "work_package": { "..." : "..." },
+  "bot_output": { "..." : "..." }
+}
+```
+
+### Response
+```json
+{
+  "criteria_results": [
+    { "id": "SC-1", "verdict": "PASS", "reason": "..." }
+  ],
+  "overall_decision": "GO",
+  "confidence": 0.9,
+  "exec_summary": ["...", "...", "..."],
+  "blockers": [],
+  "recommended_actions": [],
+  "evaluated_at": "2026-06-04T10:00:00Z",
+  "work_package_id": "WP-XXX-001",
+  "work_package_title": "...",
+  "assigned_bot": "claude-code",
+  "sprint": "A"
 }
 ```
 
 ---
 
-## Evaluation Decisions
+## Decision Criteria
 
-| Decision | Meaning | Required Action |
-|----------|---------|------------------|
-| GO | All criteria met | Merge / ship / mark done in BACKLOG |
-| NEEDS-REVISION | Partial completion | Bot revisits with specific feedback |
-| NO-GO | Goal not met | Rescope, re-spec, or reassign |
+| Verdict | Criterion |
+|---------|-----------|
+| **PASS** | Criterion clearly met; evidence present in `bot_output` |
+| **PARTIAL** | Partially met or evidence ambiguous |
+| **FAIL** | Not met or evidence absent |
 
----
-
-## Notification Flow
-
-| Channel | When | Content |
-|---------|------|---------|
-| Obsidian `/PCA/Evals/` | Every eval | Full eval note with frontmatter + criteria + exec summary |
-| WF10 | Every eval | Title + exec summary bullets |
-| ntfy `/pca-eval` | Every eval (if NTFY_URL set) | Decision + exec summary |
-| Obsidian `/PCA/Digests/` | Monday 08:00 | Full weekly digest |
-| ntfy `/pca-digest` | Monday 08:00 (if NTFY_URL set) | Eval count + pointer to digest note |
+| Decision | Rule |
+|----------|------|
+| **GO** | All criteria PASS (trivial PARTIAL with no blockers allowed) |
+| **NEEDS-REVISION** | Any PARTIAL or one recoverable FAIL |
+| **NO-GO** | Two or more FAILs, or the stated goal is not met |
 
 ---
 
-## Deployment
+## Eval Note in Obsidian
+
+Each eval produces a Markdown note at:
+```
+/files/main-vault/PCA/Evals/YYYY-MM-DD-<work_package_id>.md
+```
+
+Frontmatter:
+```yaml
+type: pca-eval
+work_package_id: "WP-XXX-001"
+decision: GO
+confidence: 0.9
+sprint: A
+evaluated_at: "2026-06-04T10:00:00Z"
+tags: [pca-eval, work-routing, go]
+```
+
+---
+
+## Monday Digest
+
+**Workflow:** WF-MondayDigest  
+**Schedule:** Every Monday at 08:00  
+**Deploy:** `. "C:\Users\client\Documents\PCA\create_wf_monday_digest.ps1"`
+
+On Monday morning, WF-MondayDigest:
+1. Reads all eval notes from `/PCA/Evals/` created in the past 7 days
+2. Sends them to Claude Opus 4.8 as a single prompt
+3. Synthesises an exec digest structured as:
+   - **Sprint Status** — 1–2 sentences on overall health
+   - **Work Package Results** — table: Title | Bot | Decision | Key Action
+   - **Decisions Required** — items needing human input (omitted if none)
+   - **Architecture Risks** — real risks only (omitted if none)
+   - **Next Sprint Recommendation** — 1 sentence
+4. Writes the digest to `/PCA/Digests/YYYY-MM-DD-monday-digest.md`
+5. Sends ntfy push (if `NTFY_URL` set)
+6. Posts WF10 incident
+
+The digest is designed to be read in 5 minutes at the Monday strategy session.
+
+---
+
+## CLI Evaluator
+
+For local evaluation without the n8n webhook:
+
+```bash
+# stdlib only — no install required for basic CLI
+python work-routing-evaluator-impl.py --eval eval-payload.json
+
+# Or split files
+python work-routing-evaluator-impl.py \
+  --work-package work-package.json \
+  --bot-output bot-output.json
+
+# JSON output
+python work-routing-evaluator-impl.py --eval eval-payload.json --json
+
+# Pipe
+cat eval-payload.json | python work-routing-evaluator-impl.py --stdin
+```
+
+Exit code: `0` for GO, `1` for NEEDS-REVISION or NO-GO.
+
+See `agents/work-routing-evaluator.md` for the full agent spec.  
+See `agents/work-routing-evaluator-impl.py` for the CLI implementation.  
+See `templates/work-package.json` for the canonical template.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VAULT_TOKEN` | Yes (n8n) | HashiCorp Vault token — read `secret/pca/anthropic` |
+| `NTFY_URL` | No | ntfy base URL — skipped silently if unset |
+| `PCA_EVAL_URL` | No | Override WF-Eval URL for CLI (default: `http://localhost:5678/webhook/pca/eval`) |
+| `PCA_EVAL_TIMEOUT` | No | Request timeout in seconds for CLI (default: `60`) |
+
+---
+
+## Deployment Checklist
 
 ```powershell
-# 1. Store Anthropic API key in Vault (once)
-vault kv put secret/pca/anthropic api_key=<your-key>
+# 1. Ensure Anthropic key in Vault
+vault kv put secret/pca/anthropic api_key=<key>
 
-# 2. Deploy eval webhook
+# 2. Deploy WF-Eval
 . "C:\Users\client\Documents\PCA\create_wf_work_routing_eval.ps1"
 
-# 3. Deploy Monday digest scheduler
+# 3. Deploy WF-MondayDigest
 . "C:\Users\client\Documents\PCA\create_wf_monday_digest.ps1"
 
 # 4. Smoke test
 . "C:\Users\client\Documents\PCA\test_wf_work_routing_eval.ps1"
+# Expected: [PASS] WF-Eval working correctly.
 ```
-
-Requires: `N8N_API_KEY` env var set.
-
----
-
-## Success Criteria for This Protocol
-
-1. `POST /webhook/pca/eval` with a valid payload returns `overall_decision` in `{GO, NEEDS-REVISION, NO-GO}`
-2. A `.md` file appears in `/PCA/Evals/` in the Obsidian vault for each eval
-3. WF10 records the eval as an incident
-4. Monday 08:00: a digest appears in `/PCA/Digests/`
-5. ntfy notification fires on eval (if `NTFY_URL` is set)
