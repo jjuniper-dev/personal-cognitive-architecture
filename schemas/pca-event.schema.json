@@ -74,8 +74,8 @@
     },
     "knowledge_lifecycle": {
       "type": "string",
-      "description": "Lifecycle state of the knowledge object at the time of this event. Follows the canonical state machine: raw → validated → reconciled → stale → archived.",
-      "enum": ["raw", "validated", "reconciled", "stale", "archived"]
+      "description": "Lifecycle state of the knowledge object at the time of this event. Canonical state machine: raw → validated → reconciled → stale → archived. tension indicates a contradiction detected by WF10 (reconcile.contradiction event).",
+      "enum": ["raw", "validated", "reconciled", "stale", "archived", "tension"]
     },
     "classification": {
       "type": "string",
@@ -115,7 +115,7 @@
     },
     "payload": {
       "type": "object",
-      "description": "Event-specific data. Shape varies by event_class and event_type. Must contain at least one property. See pca-event-backbone.md for per-class payload contracts.",
+      "description": "Event-specific data. Shape varies by event_class and event_type. Must contain at least one property. See docs/pca-event-backbone.md for per-class payload contracts.",
       "minProperties": 1
     },
     "outcome": {
@@ -193,7 +193,7 @@
       "source": "WF10",
       "timestamp": "2026-06-03T18:05:00Z",
       "actor": {"type": "workflow", "id": "WF10", "model": "llama3.2:3b"},
-      "knowledge_lifecycle": "validated",
+      "knowledge_lifecycle": "tension",
       "classification": "internal",
       "routing": {"model_tier": "local", "model_id": "llama3.2:3b"},
       "payload": {
