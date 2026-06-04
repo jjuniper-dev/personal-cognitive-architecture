@@ -89,7 +89,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Submit a PCA work package evaluation to WF-Eval."
     )
-    group = parser.add_mutually_exclusive_group(required=True)
+    # required=False so --work-package/--bot-output is also a valid input mode
+    group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
         "--eval",
         metavar="FILE",
@@ -123,6 +124,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    # Validate that exactly one input mode is active
+    split_mode = bool(args.work_package or args.bot_output)
+    if not (args.eval or args.stdin or (args.work_package and args.bot_output)):
+        if split_mode:
+            parser.error("--work-package and --bot-output must be used together")
+        else:
+            parser.error("one of --eval, --stdin, or --work-package + --bot-output is required")
+
     if args.work_package and args.bot_output:
         payload = {
             "work_package": load_json_file(args.work_package),
@@ -130,11 +139,8 @@ def main() -> int:
         }
     elif args.eval:
         payload = load_json_file(args.eval)
-    elif args.stdin:
-        payload = json.load(sys.stdin)
     else:
-        parser.print_help()
-        return 2
+        payload = json.load(sys.stdin)
 
     if "work_package" not in payload or "bot_output" not in payload:
         print("ERROR: payload must have 'work_package' and 'bot_output' keys", file=sys.stderr)
