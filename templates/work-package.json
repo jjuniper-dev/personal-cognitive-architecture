@@ -1,28 +1,35 @@
 {
-  "_schema": "work-package/v1",
-  "_doc": "Fill all fields before routing to a bot. See docs/work-routing-eval-protocol.md for the protocol.",
-  "work_package_id": "",
-  "title": "",
-  "goal": "",
-  "context": "",
-  "inputs": {
-    "files": [],
-    "references": [],
-    "constraints": []
+  "work_package": {
+    "work_package_id": "WP-XXX-001",
+    "title": "Short title for this work package",
+    "goal": "One sentence: what the bot must accomplish.",
+    "success_criteria": [
+      {
+        "id": "SC-1",
+        "description": "Observable outcome 1 — be specific enough that a reviewer can say PASS or FAIL without running the code.",
+        "verifiable_by": "automated-check"
+      },
+      {
+        "id": "SC-2",
+        "description": "Observable outcome 2.",
+        "verifiable_by": "code-inspection"
+      },
+      {
+        "id": "SC-3",
+        "description": "Observable outcome 3.",
+        "verifiable_by": "human-review"
+      }
+    ],
+    "assigned_bot": "claude-code",
+    "sprint": "A"
   },
-  "success_criteria": [
-    {
-      "id": "SC-1",
-      "description": "",
-      "verifiable_by": "test | manual-review | pr-diff | automated-check"
-    }
-  ],
-  "assigned_bot": "claude-code",
-  "target_repo": "",
-  "target_branch": "",
-  "callback_webhook": "http://localhost:5678/webhook/pca/eval",
-  "deadline_iso": "",
-  "sprint": "A",
-  "owner": "product-owner",
-  "created_at": ""
+  "bot_output": {
+    "summary": "One paragraph describing what was done.",
+    "deliverables": [
+      "path/to/file-or-artifact-1",
+      "path/to/file-or-artifact-2"
+    ],
+    "tests_passed": true,
+    "verification_notes": "How the bot verified its own work (test output, manual check, etc.)."
+  }
 }
