@@ -210,7 +210,8 @@ class PCAOrchestrator:
                     timeout=aiohttp.ClientTimeout(total=30)
                 ) as resp:
                     if resp.status == 200:
-                        return {"success": True, "routing_decision": await resp.json()}
+                        response_json = await resp.json()
+                        return {"success": True, "routing_decision": response_json.get("routing_decision")}
                     else:
                         return {"success": False, "error": f"Validation returned {resp.status}"}
         except Exception as e:

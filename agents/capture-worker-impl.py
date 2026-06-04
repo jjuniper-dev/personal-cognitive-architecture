@@ -172,13 +172,16 @@ class CaptureWorker:
             return {"success": False, "error": str(e)}
 
     async def _transcribe_openai(self, audio_content: bytes, filename: str) -> Dict:
-        """Transcribe using OpenAI Whisper API"""
+        """Transcribe using OpenAI Whisper API (v1)"""
         try:
             import io
+            from openai import OpenAI
+
+            client = OpenAI(api_key=OPENAI_API_KEY)
             audio_file = io.BytesIO(audio_content)
             audio_file.name = filename
 
-            response = self.transcription_client.Audio.transcribe(
+            response = client.audio.transcriptions.create(
                 model="whisper-1",
                 file=audio_file,
                 language="en"
@@ -186,7 +189,7 @@ class CaptureWorker:
 
             return {
                 "success": True,
-                "text": response["text"],
+                "text": response.text,
                 "confidence": 0.95
             }
         except Exception as e:
@@ -346,7 +349,8 @@ class CaptureWorker:
 
         # Metadata validation
         metadata = processed.get("metadata", {})
-        if "fetched_at" not in metadata and "original_filename" not in metadata:
+        has_timestamp = any(k in metadata for k in ["fetched_at", "original_filename", "captured_at", "published"])
+        if not has_timestamp:
             errors.append("Missing timestamp")
             quality_score -= 0.1
 
