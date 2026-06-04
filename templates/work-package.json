@@ -1,0 +1,28 @@
+{
+  "_schema": "work-package/v1",
+  "_doc": "Fill all fields before routing to a bot. See docs/work-routing-eval-protocol.md for the protocol.",
+  "work_package_id": "",
+  "title": "",
+  "goal": "",
+  "context": "",
+  "inputs": {
+    "files": [],
+    "references": [],
+    "constraints": []
+  },
+  "success_criteria": [
+    {
+      "id": "SC-1",
+      "description": "",
+      "verifiable_by": "test | manual-review | pr-diff | automated-check"
+    }
+  ],
+  "assigned_bot": "claude-code",
+  "target_repo": "",
+  "target_branch": "",
+  "callback_webhook": "http://localhost:5678/webhook/pca/eval",
+  "deadline_iso": "",
+  "sprint": "A",
+  "owner": "product-owner",
+  "created_at": ""
+}
