@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  capture-api:
+    build:
+      context: .
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env
+    environment:
+      CAPTURE_API_HOST: 0.0.0.0
+      CAPTURE_API_PORT: 8002
+      CAPTURE_STAGING_DIR: /data/capture-staging
+    volumes:
+      - ../../data/capture-staging:/data/capture-staging
