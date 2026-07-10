@@ -1,18 +1,18 @@
 {
-  "name": "PCA Ingest Loop (Unified Router)",
-  "description": "Main orchestration: Receive → Classify → Validate → Route → Store",
-  "flow": "One unified router for all three ingestion patterns",
+  "name": "PCA Ingest Loop (Split Router)",
+  "description": "Main orchestration: Receive → Split into quick-note vs KB/web → Validate → Route → Store",
+  "flow": "Two explicit ingress paths: quick-note immediately to inbox, KB/web into knowledge routing",
   "status": "Stub - Ready for Implementation",
   "version": "1.0",
   "created": "2026-04-25",
   "nodes": [
     {
-      "node_id": "Node_Webhook",
+      "node_id": "Node_QuickNoteWebhook",
       "node_type": "Webhook",
-      "name": "Capture Input (All Sources)",
-      "description": "Receive inbound captures from iPhone, web, email, RSS",
+      "name": "Quick Note Capture",
+      "description": "Receive fast iPhone / Shortcuts captures for immediate inbox handling",
       "configuration": {
-        "webhook_path": "/webhook/pca-ingest",
+        "webhook_path": "/webhook/pca/capture/quick-note",
         "webhook_method": "POST",
         "authentication": "basic",
         "expected_content_types": [
@@ -23,56 +23,77 @@
       "input_schema": "schemas/ingest-capture.schema.json",
       "output": {
         "capture_id": "{{uuid()}}",
+        "capture_lane": "quick-note",
         "source_type": "{{$json.source_type}}",
         "content": "{{$json.content}}",
         "metadata": "{{$json.metadata}}"
       },
-      "notes": "Entry point for all ingestion patterns"
+      "notes": "Immediate response path for iPhone/Shortcuts and lightweight notes"
     },
     {
-      "node_id": "Node_ClassifySourceType",
+      "node_id": "Node_KBWebhook",
+      "node_type": "Webhook",
+      "name": "KB / Web Capture",
+      "description": "Receive web, YouTube, document, and article captures for KB routing",
+      "configuration": {
+        "webhook_path": "/webhook/pca/capture/kb",
+        "webhook_method": "POST",
+        "authentication": "basic",
+        "expected_content_types": [
+          "application/json",
+          "text/plain",
+          "multipart/form-data"
+        ]
+      },
+      "input_schema": "schemas/ingest-capture.schema.json",
+      "output": {
+        "capture_id": "{{uuid()}}",
+        "capture_lane": "kb",
+        "source_type": "{{$json.source_type}}",
+        "content": "{{$json.content}}",
+        "metadata": "{{$json.metadata}}"
+      },
+      "notes": "KB inbox path for web, YouTube, documents, and richer captures"
+    },
+    {
+      "node_id": "Node_LaneSelector",
       "node_type": "IF",
-      "name": "Classify Source Type",
-      "description": "Route to appropriate processing path",
+      "name": "Select Ingress Lane",
+      "description": "Route quick-note or KB/web captures to the correct processing path",
       "conditions": [
         {
-          "condition": "source_type == 'voice' OR 'text' OR 'email'",
-          "branch": "Pattern_UnstructuredIdeas",
-          "description": "Light structuring, low confidence initial"
+          "condition": "capture_lane == 'quick-note'",
+          "branch": "Pattern_QuickNotePath",
+          "description": "Light structuring, immediate inbox response"
         },
         {
-          "condition": "source_type == 'article' OR 'pdf' OR 'web' OR 'document'",
-          "branch": "Pattern_StructuredKnowledge",
+          "condition": "capture_lane == 'kb' OR source_type == 'article' OR source_type == 'pdf' OR source_type == 'web' OR source_type == 'youtube' OR source_type == 'document'",
+          "branch": "Pattern_KBWebPath",
           "description": "Deep processing, validation required"
-        },
-        {
-          "condition": "source_type == 'rss' OR 'api'",
-          "branch": "Pattern_DynamicSignals",
-          "description": "Shallow filtering, automated scoring"
         },
         {
           "condition": "else",
           "branch": "Node_Quarantine",
-          "description": "Unknown source type"
+          "description": "Unknown lane or source type"
         }
       ]
     },
     {
-      "node_id": "Pattern_UnstructuredIdeas",
+      "node_id": "Pattern_QuickNotePath",
       "node_type": "GROUP",
-      "name": "Unstructured Ideas Path",
-      "description": "Voice, quick text, light structuring",
+      "name": "Quick Note Path",
+      "description": "Fast iPhone / Shortcuts captures, light structuring, inbox-first",
       "steps": [
         {
           "step": 1,
-          "name": "Transcribe (if voice)",
-          "node_type": "HTTP",
-          "config": "Call Whisper API OR local model",
+          "name": "Normalize Quick Note",
+          "node_type": "Function",
+          "config": "Trim text, preserve metadata, no deep enrichment",
           "output": "raw_text"
         },
         {
           "step": 2,
-          "name": "Extract Entities",
+          "name": "Extract Minimal Fields",
           "node_type": "Function",
           "config": "People, projects, deadlines, urgency markers",
           "output": "extracted_entities"
@@ -94,16 +115,16 @@
       ]
     },
     {
-      "node_id": "Pattern_StructuredKnowledge",
+      "node_id": "Pattern_KBWebPath",
       "node_type": "GROUP",
-      "name": "Structured Knowledge Path",
-      "description": "Articles, PDFs, web content, deep validation",
+      "name": "KB / Web Path",
+      "description": "Articles, YouTube, PDFs, web content, deep validation",
       "steps": [
         {
           "step": 1,
           "name": "Extract & Normalize",
           "node_type": "Function",
-          "config": "OCR if PDF, format standardization",
+          "config": "OCR if PDF, transcript fetch if YouTube, format standardization",
           "output": "clean_text, word_count, extracted_metadata"
         },
         {
