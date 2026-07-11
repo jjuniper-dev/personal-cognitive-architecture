@@ -2,28 +2,29 @@
 type: workflow
 created: 2026-04-25
 updated: 2026-04-25
-tags: [n8n, workflow, ingestion, orchestration, unified-router]
+tags: [n8n, workflow, ingestion, orchestration, split-ingress]
 status: ready-for-implementation
 ---
 
 # PCA Ingestion Pipeline - Complete n8n Workflow
 
-Production-ready unified router for all three ingestion patterns.
+Production-ready split ingress workflow with quick-note and KB/web lanes plus shared downstream routing.
 
 ## Architecture
 
 ```
 Trigger Sources (Webhook, Folder Watch, API)
     ↓
-Source Classification
-    ├─ Voice (Transcription → Structured Knowledge)
-    ├─ Article (URL extraction → Structured Knowledge)
+Ingress Lane Selection
+    ├─ Quick Note (iPhone / Shortcuts → Inbox)
+    ├─ KB / Web (articles, YouTube, docs → Knowledge routing)
     └─ Signal (RSS/API → Dynamic Signals)
     ↓
-Pattern Router
-    ├─ Structured Knowledge (High confidence paths)
-    ├─ Unstructured Ideas (Low confidence, needs review)
-    └─ Dynamic Signals (Time-sensitive)
+Shared Routing Core
+    ├─ Validation (schema / metadata / safety)
+    ├─ Routing Rules (shared policy)
+    ├─ Reconciliation (for knowledge paths)
+    └─ Dynamic Signals (time-sensitive)
     ↓
 Validation & Classification
     ├─ Scoring (4D model: credibility, relevance, novelty, signal_strength)
@@ -138,16 +139,16 @@ Code:
   return [];
 ```
 
-### 4. Source Classification
+### 4. Ingress Lane Selection
 
-**Node 6: Classify Source Type**
+**Node 6: Select Ingress Lane**
 ```
 Type: Switch
 Logic:
-  if capture_type == 'voice' → Branch: Voice Processing
-  if capture_type == 'article' → Branch: Article Processing
+  if capture_lane == 'quick-note' OR source_type == 'iphone' OR source_type == 'shortcuts' → Branch: Quick Note Path
+  if capture_lane == 'kb' OR source_type == 'web' OR source_type == 'article' OR source_type == 'youtube' OR source_type == 'document' OR source_type == 'pdf' → Branch: KB / Web Path
   if capture_type == 'signal' → Branch: Signal Processing
-  else → Branch: Text/Idea Processing
+  else → Branch: Quarantine / Review
 ```
 
 ### 5. Voice Transcription

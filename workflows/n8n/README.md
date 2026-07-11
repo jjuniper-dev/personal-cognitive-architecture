@@ -6,15 +6,10 @@ n8n workflows orchestrate the PCA capture pipeline. This directory contains work
 
 ## Architecture Principle
 
-**One unified ingestion router** that:
-1. Classifies source type
-2. Applies ingest template
-3. Validates metadata
-4. Applies routing policy
-5. Writes to Obsidian
-6. Triggers optional processing
-
-Not three separate workflows — one classifier, three routing paths.
+**Split ingress with a shared routing core**:
+1. Quick-note captures from iPhone / Shortcuts enter a fast inbox-first path.
+2. KB/web captures from web, YouTube, documents, and articles enter a deeper knowledge path.
+3. Both paths share validation, audit, and downstream routing rules.
 
 ## Workflows
 
@@ -22,10 +17,10 @@ Not three separate workflows — one classifier, three routing paths.
 
 #### `pca-ingest-loop.json`
 **Purpose**: Main orchestration loop
-**Trigger**: Webhook from capture source (iPhone, web, email, RSS)
+**Trigger**: Webhooks from capture source
 **Flow**:
-1. Receive inbound capture (voice, article, signal)
-2. Classify source type
+1. Receive quick-note capture or KB/web capture
+2. Select lane
 3. Apply ingest template
 4. Normalize content
 5. Score and validate
@@ -169,9 +164,15 @@ vi workflows/n8n/pca-ingest-loop.stub.json
 
 ### Input Nodes
 
-**Webhook (Ingest)**
-- Receives captures from iPhone Shortcuts, browser, email
-- Input: multipart form data with audio file + metadata
+**Webhook (Quick Note)**
+- Receives captures from iPhone Shortcuts and fast text capture
+- Immediate inbox-first path
+- Input: JSON or multipart form data with text + metadata
+
+**Webhook (KB / Web)**
+- Receives web articles, YouTube links, documents, and richer captures
+- Routes into KB processing
+- Input: structured JSON with source + content metadata
 - Output: structured JSON matching ingest-capture.schema.json
 
 **Schedule (Signal Polling)**
