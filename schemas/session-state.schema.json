@@ -1,0 +1,170 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/jjuniper-dev/personal-cognitive-architecture/schemas/session-state.schema.json",
+  "title": "PCA Session State",
+  "description": "Canonical state record for a PCA session. Every governed session must produce a record conforming to this schema. See docs/session-lifecycle.md for stage definitions.",
+  "type": "object",
+  "required": ["session_id", "started_at", "initiator", "objective", "priority", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique session identifier.",
+      "pattern": "^pca-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3,}$",
+      "examples": ["pca-2026-06-09-001"]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when the session was initiated."
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when the session reached a terminal state. Absent if still active."
+    },
+    "initiator": {
+      "type": "string",
+      "description": "What or who started the session.",
+      "examples": ["human", "scheduled", "agent:intake-agent"]
+    },
+    "objective": {
+      "type": "string",
+      "description": "One-sentence description of the session goal.",
+      "examples": ["Draft E-Learn.0 self-learning contract and commit to repo."]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["high", "normal", "low"],
+      "description": "Session priority — used for resource and scheduling decisions."
+    },
+    "active_epic": {
+      "type": "string",
+      "description": "Work package or epic ID this session advances, if applicable.",
+      "examples": ["PCA-WP-SESSION-HARNESS-001", "E-Learn.0"]
+    },
+    "active_task": {
+      "type": "string",
+      "description": "Backlog item or GitHub issue being worked. Set during Task Selection stage.",
+      "examples": ["#45", "PCA-WP-SESSION-HARNESS-001.Step1"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "blocked", "completed", "interrupted"],
+      "description": "Current lifecycle status. See docs/session-lifecycle.md for the state machine."
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "session-start",
+        "context-assembly",
+        "task-selection",
+        "execution",
+        "validation",
+        "knowledge-capture",
+        "backlog-update",
+        "session-handover"
+      ],
+      "description": "Current or last-reached lifecycle stage."
+    },
+    "context_loaded": {
+      "type": "array",
+      "description": "List of documents and memory sources loaded during Context Assembly.",
+      "items": {"type": "string"},
+      "examples": [["CLAUDE.md", "BACKLOG.md", "HANDOVER.md"]]
+    },
+    "artifacts_produced": {
+      "type": "array",
+      "description": "Paths or identifiers of durable artifacts produced during Execution.",
+      "items": {"type": "string"},
+      "examples": [["docs/self-learning-contract.md", "schemas/session-state.schema.json"]]
+    },
+    "validation_result": {
+      "type": "string",
+      "enum": ["pass", "partial", "fail", "not-run"],
+      "description": "Outcome of the Validation stage."
+    },
+    "blockers": {
+      "type": "array",
+      "description": "Recorded blockers that halted or interrupted execution.",
+      "items": {
+        "type": "object",
+        "required": ["description", "recorded_at"],
+        "additionalProperties": false,
+        "properties": {
+          "description": {"type": "string"},
+          "recorded_at": {"type": "string", "format": "date-time"},
+          "resolved": {"type": "boolean"}
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "description": "Significant decisions made during the session.",
+      "items": {
+        "type": "object",
+        "required": ["description", "recorded_at"],
+        "additionalProperties": false,
+        "properties": {
+          "description": {"type": "string"},
+          "recorded_at": {"type": "string", "format": "date-time"},
+          "context": {"type": "string"}
+        }
+      }
+    },
+    "learning_candidates": {
+      "type": "array",
+      "description": "Learning signals flagged for human review per the self-learning contract.",
+      "items": {
+        "type": "object",
+        "required": ["category", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["behaviour-correction", "user-preference", "domain-knowledge"]
+          },
+          "description": {"type": "string"},
+          "approved": {"type": "boolean"}
+        }
+      }
+    },
+    "handover_path": {
+      "type": "string",
+      "description": "Path to the HANDOVER.md produced at session end.",
+      "examples": ["HANDOVER.md", "system/sessions/handover-pca-2026-06-09-001.md"]
+    }
+  },
+  "examples": [
+    {
+      "session_id": "pca-2026-06-09-001",
+      "started_at": "2026-06-09T14:00:00Z",
+      "ended_at": "2026-06-09T15:30:00Z",
+      "initiator": "human",
+      "objective": "Draft E-Learn.0 self-learning contract and commit to repo.",
+      "priority": "high",
+      "active_epic": "E-Learn.0",
+      "active_task": "#45",
+      "status": "completed",
+      "stage": "session-handover",
+      "context_loaded": ["CLAUDE.md", "BACKLOG.md"],
+      "artifacts_produced": ["docs/self-learning-contract.md"],
+      "validation_result": "pass",
+      "blockers": [],
+      "decisions": [
+        {
+          "description": "Split E-Learn.0 from richer schema design — schema work deferred to E-Learn.4.",
+          "recorded_at": "2026-06-09T14:20:00Z"
+        }
+      ],
+      "learning_candidates": [
+        {
+          "category": "user-preference",
+          "description": "User prefers concise agent contracts under 400 words before expanding to schema design.",
+          "approved": false
+        }
+      ],
+      "handover_path": "HANDOVER.md"
+    }
+  ]
+}
