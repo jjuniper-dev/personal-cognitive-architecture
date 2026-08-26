@@ -1,0 +1,22 @@
+{
+  // Adds a "Cline (OpenRouter)" entry to the integrated terminal's profile
+  // picker. Does not change the default terminal profile — existing shells
+  // are untouched. Launches the `cline` CLI's interactive TUI (-i) against
+  // the "openrouter" provider already configured in ~/.cline (see
+  // docs/cline-config.md #6). No model is pinned here, so the Cline TUI can use
+  // the provider's current model selection/catalog. Tool auto-approval stays
+  // off for PCA.
+  "terminal.integrated.profiles.osx": {
+    "Cline (OpenRouter)": {
+      "path": "cline",
+      "args": [
+        "-i",
+        "-P",
+        "openrouter",
+        "--auto-approve",
+        "false"
+      ],
+      "icon": "sparkle"
+    }
+  }
+}
