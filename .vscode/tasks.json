@@ -11,9 +11,34 @@
       "id": "clinePrompt",
       "type": "promptString",
       "description": "Prompt for Cline"
+    },
+    {
+      "id": "claudePrompt",
+      "type": "promptString",
+      "description": "Prompt for Claude Code"
+    },
+    {
+      "id": "codexPrompt",
+      "type": "promptString",
+      "description": "Read-only prompt for Codex"
     }
   ],
   "tasks": [
+    {
+      "label": "Claude Code: prompt",
+      "type": "shell",
+      "command": "claude",
+      "args": [
+        "--ide",
+        "--permission-mode", "manual",
+        "${input:claudePrompt}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
     {
       "label": "Cline: OpenRouter prompt",
       "type": "shell",
@@ -25,6 +50,22 @@
         "--auto-approve", "false",
         "-c", "${workspaceFolder}",
         "${input:clinePrompt}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Codex: read-only prompt",
+      "type": "shell",
+      "command": "codex",
+      "args": [
+        "exec",
+        "--cd", "${workspaceFolder}",
+        "--sandbox", "read-only",
+        "${input:codexPrompt}"
       ],
       "presentation": {
         "reveal": "always",
