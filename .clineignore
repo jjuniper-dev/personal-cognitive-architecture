@@ -1,0 +1,36 @@
+# Cline context/ignore rules for Personal Cognitive Architecture (PCA)
+# Mirrors and extends .gitignore. Files listed here are excluded from Cline's
+# file reads, search, and context-building operations to protect secrets,
+# reduce noise, and avoid wasting context window on generated/binary content.
+
+# Version control / editor
+.git/
+.DS_Store
+
+# Dependencies / build artifacts
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+
+# Secrets and environment
+.env
+.env.local
+.env.*
+!.env.example
+
+# Personal / sensitive data (read explicitly with read_file when a task
+# genuinely requires it; excluded from broad search/context scans by default)
+data/personal-profile.json
+data/personal-os-profile.json
+
+# Generated/derived artifacts
+outputs/
+
+# Large binary/office documents (not useful as text context)
+docs/*.pptx
+docs/*.docx
+
+# Lockfiles (large, low signal-to-noise for code review tasks)
+package-lock.json

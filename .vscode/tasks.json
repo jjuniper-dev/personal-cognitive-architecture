@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "clineModel",
+      "type": "promptString",
+      "description": "OpenRouter model id for this Cline run",
+      "default": "z-ai/glm-5.3"
+    },
+    {
+      "id": "clinePrompt",
+      "type": "promptString",
+      "description": "Prompt for Cline"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Cline: OpenRouter prompt",
+      "type": "shell",
+      "command": "cline",
+      "args": [
+        "-P", "openrouter",
+        "-m", "${input:clineModel}",
+        "--thinking", "low",
+        "--auto-approve", "false",
+        "-c", "${workspaceFolder}",
+        "${input:clinePrompt}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

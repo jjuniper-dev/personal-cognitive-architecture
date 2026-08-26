@@ -1,0 +1,96 @@
+# Cline Project Rules — Personal Cognitive Architecture (PCA)
+
+This file is loaded automatically by Cline as custom instructions for every task in this
+workspace. It summarizes the binding rules defined in `AGENTS.md` (with Claude-specific
+supplementary guidance in `CLAUDE.md`). Read `AGENTS.md` in full before making non-trivial
+changes. If this file and `AGENTS.md` ever disagree, `AGENTS.md` is authoritative — update this
+file to match rather than the reverse.
+
+## Repository Mission
+
+PCA is governed personal AI infrastructure — not a chatbot, note app, or workflow collection. It
+captures, validates, structures, retrieves, and activates knowledge over time while remaining
+inspectable, local-first where practical, and maintainable by one operator.
+
+- **PCA** = the durable system/architecture name.
+- **Ayla** = the assistant/persona/interface name.
+- Rule of thumb: if a component would still exist after renaming the assistant, call it PCA.
+
+## Mental Model
+
+```
+Capture → Reconcile → Activate
+Input → Event → Validate → Route → Store → Retrieve → Act → Audit
+```
+
+Every change should map onto this chain. If it doesn't, stop and flag the ambiguity instead of
+guessing.
+
+## Before Editing
+
+1. Read the relevant local files first — never assume file contents.
+2. Identify the architectural layer being touched: L1 Knowledge & Control, L2 Agent Runtime,
+   L3 Workflow & Integration, L4 Infrastructure, or L5 AI Models.
+3. Identify the owning component and whether canonical memory, graph state, workflow state,
+   model calls, or external actions are affected.
+4. Keep changes as small and surgical as possible. Do not perform broad refactors while
+   completing a narrow request; note unrelated bloat instead of fixing it unprompted.
+
+## Naming Discipline
+
+Do not call everything an "agent." Use:
+- **assistant** — user-facing conversational interface
+- **workflow** — deterministic n8n orchestration
+- **tool** — callable capability
+- **worker** — bounded task execution
+- **agent** — only when autonomous planning or tool selection is genuinely present
+
+## Canonical Memory Rules
+
+Never write to Obsidian, graph state, durable metadata, or source registers without an explicit
+validation path: source identifier, timestamp, provenance, classification/sensitivity, validation
+status, owning component, and a rollback/deletion story. Derived memory (embeddings, summaries,
+indexes, graph projections) is not authoritative unless explicitly declared so.
+
+## Event Backbone Rules
+
+Prefer explicit, schema-validatable, timestamped, source-linked events over hidden side effects.
+Do not bypass the event model with a new workflow path unless the task explicitly calls for a
+temporary experiment — and document any such bypass.
+
+## Security and Secrets
+
+Never commit secrets, tokens, API keys, private credentials, or live personal data. Use
+environment variables or a local `.env` (excluded from git). If a workflow needs secrets, document
+the variable names and purpose without real values.
+
+## Testing and Verification
+
+Prefer the repo's existing automated tests. When none exist, provide a clear manual verification
+path. Report what was changed, what was verified, what was not verified, and what assumptions
+remain. Do not claim success for unrun tests. If a bug fix breaks existing tests, fix the code —
+do not edit test assertions to match new behavior unless explicitly asked.
+
+## Preferred Completion Output
+
+```md
+## Summary
+- what changed
+
+## Files Changed
+- path: why it changed
+
+## Verification
+- checks/tests run
+- checks/tests not run
+
+## Architecture Notes
+- layer affected
+- state affected
+- risks or follow-up items
+```
+
+## Default Posture
+
+PCA values maintainability over novelty. When uncertain, choose the smaller, clearer, more
+inspectable change.
