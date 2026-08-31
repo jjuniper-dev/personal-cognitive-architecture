@@ -52,6 +52,11 @@ validation path: source identifier, timestamp, provenance, classification/sensit
 status, owning component, and a rollback/deletion story. Derived memory (embeddings, summaries,
 indexes, graph projections) is not authoritative unless explicitly declared so.
 
+**Public repository boundary**: public repositories must not become canonical storage for personal
+identity, personal cognitive state, journals, or governed memory. Such information belongs in the
+PCA Knowledge Layer and may only appear in the repository as intentionally sanitized fixtures or
+test data. Canonical memory and the public git repository are intentionally different authorities.
+
 ## Event Backbone Rules
 
 Prefer explicit, schema-validatable, timestamped, source-linked events over hidden side effects.
