@@ -181,6 +181,12 @@ Any durable memory write should have:
 
 Derived memory such as embeddings, summaries, indexes, and graph projections must not be treated as authoritative unless explicitly declared.
 
+### Public Repository Boundary
+
+Public repositories must not become canonical storage for personal identity, personal cognitive state, journals, or governed memory. Such information belongs in the PCA Knowledge Layer and may only appear in the repository as intentionally sanitized fixtures or test data.
+
+Canonical memory and the public git repository are intentionally different authorities.
+
 ---
 
 ## Event Backbone Rules
