@@ -7,6 +7,15 @@
   // the provider's current model selection/catalog. Tool auto-approval stays
   // off for PCA.
   "terminal.integrated.profiles.osx": {
+    "Claude Code": {
+      "path": "claude",
+      "args": [
+        "--ide",
+        "--permission-mode",
+        "manual"
+      ],
+      "icon": "sparkle"
+    },
     "Cline (OpenRouter)": {
       "path": "cline",
       "args": [
@@ -15,6 +24,18 @@
         "openrouter",
         "--auto-approve",
         "false"
+      ],
+      "icon": "sparkle"
+    },
+    "Codex": {
+      "path": "codex",
+      "args": [
+        "--cd",
+        "${workspaceFolder}",
+        "--sandbox",
+        "workspace-write",
+        "--ask-for-approval",
+        "on-request"
       ],
       "icon": "sparkle"
     }
